@@ -1,2 +1,2 @@
 # Java基础
-- [JDK&JRE](./Java/JDK & JRE.md)
+- [JDK、JRE](./Java/JDK & JRE.md)
