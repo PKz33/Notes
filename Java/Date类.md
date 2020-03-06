@@ -1,5 +1,5 @@
 ## Date类
-- **SimpleDateFormat**
+- **SimpleDateFormat**  
 用法：
 ```
   // 1.创建SimpleDateFormat类对象，构造方法中传递指定的模式
