@@ -68,4 +68,21 @@ a. 创建`ObjectInputStream`对象，构造方法中传递字节输入流
 b. 使用`ObjectInputStream`对象中的方法`readObject`读取保存对象的文件    
 c. 释放资源  
 d. 使用读取出来的对象（打印）
-
+- **static关键字**    
+静态关键字。静态优先于非静态加载到内存中（静态优先于对象进入到内存中），被`static`修饰的成员变量不能被序列化，序列化的都是对象
+```
+  private static int age;
+  oos.writeObject(new Person("小美女", 18));
+  Object o = ois.readObject();
+  // Person{name = "小美女", age = 0}
+```
+- **transient关键字**  
+瞬态关键字。被`transient`修饰的成员变量，不能被序列化
+```
+  private transient int age;
+  oos.writeObject(new Person("小美女", 19));
+  Object o = ois.readObject();
+  // Person{name = "小美女", age = 0}
+```
+- **InvalidClassException原理**
+![](./Pics/IO6.png)
