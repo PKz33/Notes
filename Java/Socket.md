@@ -25,3 +25,34 @@ e. 使用`Socket`对象中的方法`getOutputStream()`获取网络字节输出�
 f. 使用网络字节输出流`OutputStream`对象中的方法`write`，给客户端回写数据  
 d. 释放资源（`Socket`，`ServerSocket`）
 ![](./Pics/Socket1.png)
+- **文件上传案例**    
+客户端读取本地文件，把文件上传到服务器，服务器再把上传的文件保存到服务器的硬盘上  
+1. 客户端使用本地字节输入流，读取要上传的文件  
+2. 客户端使用网络字节输出流，把读取到的文件上传到服务器  
+3. 服务器使用网络字节输入流，读取客户端上传的文件 
+4. 服务器使用本地字节输出流，把读取的文件，保存到服务器的硬盘上 
+5. 服务器使用网络字节输出流，给客户端回写一个“上传成功”
+6. 客户端使用网络字节输入流，读取服务器回写的数据
+7. 释放资源  
+注意：客户端和服务器和本地硬盘进行读写，需要使用自己创建的字节流对象（本地流）。客户端和服务器之间进行读写，必须使用`Socket`中提供的字节流对象（网络流）  
+8. 客户端：读取本地文件，上传到服务器，读取服务器回写的数据，实现步骤：  
+a. 创建一个本地字节输入流`FileInputStream`对象，构造方法中绑定要读取的数据源  
+b. 创建一个客户端`Socket`对象，构造方法中绑定服务器的IP地址和端口号  
+c. 使用`Socket`中的方法`getOutputStream`，获取网络字节输出流`OutputStream`对象  
+d. 使用本地字节输入流`FileInputStream`对象中的方法`read`，读取本地文件  
+e. 使用网络字节输出流`OutputStream`对象中的方法`write`，把读取到的文件上传到服务器  
+f. 使用`Socket`中的方法`getInputStream`，获取网络字节输入流`InputStream`对象  
+g. 使用网络字节输入流`InputStream`对象中的方法`read`读取服务器回写的数据  
+h. 释放资源（`FileInputStream`，`Socket`）
+9. 服务器端：读取客户端上传的文件，保存到服务器的硬盘，给客户端回写“上传成功”，实现步骤：  
+a. 创建一个服务器`ServerSocket`对象，绑定要指定的端口号  
+b. 使用`ServerSocket`对象中的方法`accept`，获取到请求的客户端`Socket`对象  
+c. 使用`Socket`对象中的方法`getInputStream`，获取到网络字节输入流`InputStream`对象  
+d. 判断服务器硬盘保存文件的文件夹是否存在，不存在则创建  
+e. 创建一个本地字节输出流`FileOutputStream`对象，构造方法中绑定要输出的目的地  
+f. 使用网络字节输入流`InputStream`对象中的方法`read`，读取客户端上传的文件  
+g. 使用本地字节输出流`FileOutStream`对象中的方法`write`，把读取到的文件保存到服务器的硬盘上  
+h. 使用`Socket`对象中的方法`getOutputStream`，获取到网络字节输出流`OutputStream`对象  
+i. 使用网络字节输出流`OutputStream`对象中的方法`write`，给客户端回写“上传成功”  
+j. 释放资源（`FileOutputStream`，`Socket`，`ServerSocket`）
+![](./Pics/Socket2.png)
