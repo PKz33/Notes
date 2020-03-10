@@ -89,7 +89,7 @@
 ```
 5.  
 ![](./Pics/IOC1.png)
-- **Spring核心容器**  
+- **IOC核心容器**  
 1.   
 ```
   // 配置文件
@@ -160,3 +160,160 @@ d. `session`：作用于web应用的会话范围
 e. `global-session`：作用于集群环境的会话范围（全局会话范围），当不是集群环境时，它就是`session`  
 ![](./Pics/global-session.png)
 3. 常用的时单例的和多例的  
+- **Bean对象的生命周期**  
+1. 单例对象  
+a. 出生：当容器创建时对象出生  
+b. 存活：只要容器还在，对象一直存活  
+c. 死亡：容器销毁，对象消亡  
+d. 总结：单例对象的声明周期和容器相同  
+2. 多例对象  
+a. 出生：当我们使用对象时`Spring`框架为我们创建  
+b. 存活：对象只要是在使用过程中就一直存活  
+c. 死亡：当对象长时间不用，且没有别的对象引用时，由Java的垃圾回收器回收  
+- **Spring中的依赖注入**  
+1. IOC的作用：降低程序间的耦合（依赖关系）
+2. 依赖注入：Dependency Injection。依赖关系的管理都交给`Spring`来维护，在当前类需要用到其他类的对象时，由`Spring`为我们提供，我们只需要在配置文件中说明依赖关系的维护，就称之为依赖注入  
+3. 依赖注入能注入的数据有三类：基本类型和`String`；其他`bean`类型（在配置文件中或者注解配置过的`bean`）；复杂类型/集合类型  
+- **依赖注入的方式**   
+```
+  public class AccountServiceImpl implements IAccountService {
+    // 如果是经常变化的数据，并不适用于注入的方式
+    private String name;
+    private Integer age;
+    private Date birthday;
+    
+    public AccountServiceImpl(String name, Integer age, Date birthday) {
+      this.name = name;
+      this.age = age;
+      this.birthday = birthday;
+    }
+    
+    public void setName(String name) {
+      this.name = name;
+    }
+    
+    public void setAge(Integer age) {
+      this.age = age;
+    }
+    
+    public void setBirthday(Date birthday) {
+      this.birthday = birthday;
+    }
+    
+    public void saveAccount() {
+      System.out.println("Service中的saveAccount方法执行：" + name + ", " + age + ", " + birthday);
+    }
+  }
+```
+1. 第一种：使用构造函数提供  
+```
+  <!--
+    构造函数注入：
+    使用的标签：constructor-arg
+    标签出现的位置：bean标签的内部
+    标签中的属性：
+      type：用于指定要注入的数据的数据类型，该数据类型也是构造函数中某个或某些参数的类型  
+      index：用于指定要注入的数据给构造函数中指定索引位置的参数赋值，索引的位置是从0开始
+      name：用于指定给构造函数中指定名称的参数赋值（常用）
+      以上三个属性用于指定给构造函数中哪个参数赋值
+      value：用于提供基本类型和String类型的数据
+      ref：用于指定其他的bean类型数据，就是在spring的IOC核心容器中出现过的bean对象
+      
+    优势：在获取bean对象时，注入数据是必须的操作，否则对象无法创建成功
+    弊端：改变了bean对象的实例化方式，在创建对象时，如果用不到这些数据，也必须提供
+  -->
+  <bean id="accountService" class="com.hzhang.service.impl.AccountServiceImpl">
+    <constructor-arg name="name" value="pkz"></constructor-arg>
+    <constructor-arg name="age" value="17"></constructor-arg>
+    <constructor-arg name="birthday" ref="current-time"></constructor-arg>
+  </bean>
+  
+  <!-- 配置一个日期对象 -->
+  <bean id="current-time" class="java.util.Date"></bean>
+```
+2. 第二种：使用`set`方法提供（常用）  
+```
+  <!--
+    set方法注入：
+    涉及的标签：property
+    出现的位置：bean标签的内部
+    标签的属性：
+      name：用于指定注入时所调用的set方法名称
+      value：用于提供基本类型和String类型的数据
+      ref：用于指定其他的bean类型数据，就是在spring的IOC容器中出现过的bean对象
+      
+    优势：创建对象时没有明确的限制，可以直接使用默认构造函数
+    弊端：如果某个成员必须有值，则获取对象时有可能set方法没有执行
+  -->  
+  <bean id="accountService" class="com.hzhang.service.impl.AccountServiceImpl">
+    <property name="name" value="pkz"></property>
+    <property name="age" value="17"></property>
+    <property name="birthday" ref="current-time"></property>
+  </bean>
+  
+  <bean id="current-time" class="java.util.Date"></bean>  
+```
+3. 第三种：使用注解提供  
+- **复杂类型/集合类型的注入**  
+```
+  public class AccountServiceImpl implements IAccountService {
+    private String[] strs;
+    private List<String> list;
+    private Set<String> set;
+    private Map<String, String> map;
+    private Properties props;
+    
+    // 此处省略Setter
+  }
+  
+  // 配置文件
+  <!--
+    复杂类型/集合类型的注入
+    用于给List结构集合注入的标签：
+      list  array  set
+    用于给Map结构集合注入的标签：
+      map  props
+    结构相同，标签可以互换
+  -->
+  <bean id="accountService" class="com.hzhang.service.impl.AccountServiceImpl">
+    <property name="strs">
+      <array>
+        <value>AA</value>
+        <value>BB</value>
+        <value>CC</value>
+      </array>
+    </property>
+    
+    <property name="list">
+      <list>
+        <value>AA</value>
+        <value>BB</value>
+        <value>CC</value>
+      </list>
+    </property>
+    
+    <property name="set">
+      <set>
+        <value>AA</value>
+        <value>BB</value>
+        <value>CC</value>
+      </set>
+    </property>
+    
+    <property name="map">
+      <map>
+        <entry key="AA" value="aa"></entry>
+        <entry key="BB">
+          <value>bb</value>
+        </entry>
+      </map>
+    </property>
+    
+    <property name="props">
+      <props>
+        <prop key="AA" value="aa"></prop>
+        <prop key="BB" value="bb"></prop>
+      </props>
+    </property>
+  </bean>
+```
