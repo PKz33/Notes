@@ -89,3 +89,74 @@
 ```
 5.  
 ![](./Pics/IOC1.png)
+- **Spring核心容器**  
+1.   
+```
+  // 配置文件
+  <beans xmlns="">
+    <!--把对象的创建交给Spring管理-->
+    <bean id="accountService" class="com.hzhang.service.impl.AccountServiceImpl"></bean>
+  </beans>
+  
+  // 获取Spring的IOC核心容器，并根据id获取对象
+  // 1. 获取核心容器对象
+  ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml");
+  // 2. 根据id获取Bean对象
+  IAccountService as = (IAccountService)ac.getBean("accountService");
+  // 3. 手动关闭容器
+  ac.close();
+```
+2. `ApplicationContext`的三个常用实现类：  
+a. `ClassPathXmlApplicationContext`：可以加载类路径下的配置文件，要求配置文件必须在类路径下，不在则加载不了  
+b. `FileSystemXmlApplicationContext`：可以加载磁盘任意路径下的配置文件（必须有访问权限）  
+c. `AnnotationConfigApplicationContext`：用于读取注解创建容器  
+`ApplicationContext ac = new FileSystemXmlApplicationContext("C:\\Users\\hzhang\\Desktop\\bean.xml");`  
+3. 核心容器的两个接口引发的问题：  
+a. `ApplicationContext`：在构建核心容器时，创建对象采取的策略是立即加载。也就是，只要一读取完配置文件马上就创建配置文件中配置的对象。单例对象适用。一般使用此接口       
+b. `BeanFactory`：在创建核心容器时，创建对象采取的策略是延迟加载。也就是，什么时候根据`id`获取对象，什么时候才真正创建对象。多例对象适用      
+```
+  // BeanFactory
+  Resource resource = new ClassPathResource("bean.xml");
+  BeanFactory factory = new XmlBeanFactory(resource);
+  IAccountService as = (IAccountService)factory.getBean("accountService");
+```  
+- **Spring中创建Bean的三种方式**  
+1. 第一种方式：使用默认构造函数创建。在Spring的配置文件中使用`bean`标签，配置`id`和`class`属性之后，且没有其他属性和标签时，采用的就是默认构造函数创建`bean`对象。此时如果类中没有默认构造函数，则对象无法创建  
+`<bean id="accountService" class="com.hzhang.service.impl.AccountServiceImpl"></bean>`  
+2. 第二种方式：使用普通工厂中的方法创建对象  
+```
+  // 模拟一个工厂类（该类可能存在于jar包中，无法通过修改源码的方式提供默认构造函数）
+  public class InstanceFactory {
+    public IAccountService getAccountService() {
+      return new AccountServiceImpl();
+    }
+  }
+  
+  // 配置文件
+  // 使用某个类中的方法创建对象，并存入Spring容器
+  <bean id="instanceFactory" class="com.hzhang.factory.InstanceFactory"></bean>
+  <bean id="accountService" factory-bean="instanceFactory" factory-method="getAccountService"></bean>
+```  
+3. 第三种方式：使用工厂中的静态方法创建对象  
+```
+  // 模拟一个工厂类（该类可能是存在于jar包中的，无法通过修改源码的方式提供默认构造函数）
+  public class StaticFactory {
+    public static IAccountService getAccountService() {
+      return new AccountServiceImpl();
+    }
+  }
+  
+  // 配置文件
+  // 使用某个类中的静态方法创建对象，并存入Spring容器
+  <bean id="accountService" class="com.hzhang.factory.StaticFactory" factory-method="getAccountService"></bean>
+```
+- **Bean对象的作用范围**  
+1. `bean`标签的`scope`属性，用于指定`bean`的作用范围  
+2. `scope`的取值：  
+a. `singleton`：单例的（默认值）  
+b. `prototype`：多例的  
+c. `request`：作用于web应用的请求范围  
+d. `session`：作用于web应用的会话范围  
+e. `global-session`：作用于集群环境的会话范围（全局会话范围），当不是集群环境时，它就是`session`  
+![](./Pics/global-session.png)
+3. 常用的时单例的和多例的  
