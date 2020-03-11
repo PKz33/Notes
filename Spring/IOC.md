@@ -326,12 +326,12 @@ c. 死亡：当对象长时间不用，且没有别的对象引用时，由Java�
   </beans>
 ```
 1. 用于创建对象的：作用就和在XML配置文件中编写一个`<bean>`标签实现的功能一样  
-a. `Component`  
+a. `@Component`  
 作用：用于把当前类对象存入`spring`容器中  
 属性：`value`用于指定`bean`的`id`，当不写时，默认值是当前类名，且首字母改小写  
-b. `Controller`：一般用在表现层  
-c. `Service`：一般用在业务层  
-d. `Repository`：一般用在持久层  
+b. `@Controller`：一般用在表现层  
+c. `@Service`：一般用在业务层  
+d. `@Repository`：一般用在持久层  
 ```
   @Component
   public class AccountServiceImpl implements IAccountService {
@@ -348,9 +348,9 @@ d. `Repository`：一般用在持久层
   // 根据id获取bean对象
   IAccountService as = (IAccountService)ac.getBean("accountServiceImpl");
 ```
-e. 以上三个注解的作用和属性与`Component`是一模一样，是`spring`框架提供明确的三层使用的注解，使三层对象更加清晰
+e. 以上三个注解的作用和属性与`@Component`是一模一样，是`spring`框架提供明确的三层使用的注解，使三层对象更加清晰
 2. 用于注入数据的：作用就和在XML配置文件中的`bean`标签中写一个`<property>`标签的作用一样  
-a. `Autowired`  
+a. `@Autowired`  
 作用：自动按照类型注入，只要容器中唯一的一个`bean`对象类型和要注入的变量类型匹配，就可以注入成功。如果`ioc`容器中没有任何`bean`的类型和要注入的变量类型匹配，则报错。  
 ![](./Pics/自动注入1.png)
 如果`ioc`容器中有多个类型匹配时：  
@@ -373,7 +373,7 @@ a. `Autowired`
 
   IAccountDao adao = ac.getBean("accountDao", IAccountDao.class);
 ```  
-b. `Qualifier`    
+b. `@Qualifier`    
 作用：在按照类中注入的基础之上再按照名称注入，在给类成员注入时不能单独使用（必须和`Autowired`结合使用），但是在给方法参数注入时可以  
 属性：`value`用于指定注入`bean`的`id`
 ```
@@ -381,7 +381,7 @@ b. `Qualifier`
   @Qualifier("accountDao1")
   private IAccountDao accountDao = null;
 ```  
-c. `Resource`  
+c. `@Resource`  
 作用：直接按照`bean`的`id`注入，可以独立使用  
 属性：`name`用于指定`bean`的`id`  
 ```
@@ -389,11 +389,11 @@ c. `Resource`
   private IAccountDao accountDao = null;
 ```  
 d. 以上三个注入都只能注入`bean`类型的数据，而基本类型和`String`类型无法使用上述注解实现。另外，集合类型的注入只能通过XML来实现  
-e. `Value`  
+e. `@Value`  
 作用：用于注入基本类型和`String`类型的数据  
 属性：`value`用于指定数据的值。可以使用`spring`中`SpEL`（也就是`spring`的`el`表达式），`SpEL`的写法：`${表达式}`  
 3. 用于改变作用范围的：作用就和在`bean`标签中使用`scope`属性实现的功能是一样的  
-a. `Scope`  
+a. `@Scope`  
 作用：用于指定`bean`的作用范围  
 属性`value`指定范围的值，常用取值：`singleton`、`prototype`  
 ```
@@ -405,8 +405,8 @@ a. `Scope`
   System.out.pringln(as == as2); // true
 ```
 4. 和生命周期相关的：作用就和在`bean`标签中使用`init-method`和`destroy-method`的作用一样  
-a. `PreDestroy`用于指定销毁方法  
-b. `PostConstruct`用于指定初始化方法  
+a. `@PreDestroy`用于指定销毁方法  
+b. `@PostConstruct`用于指定初始化方法  
 ```
   @PostConstruct
   public void init(){
