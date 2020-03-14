@@ -110,3 +110,24 @@ c. `create`方法的参数：
   
   cglibProducer.saleProduct(10000f);
 ```
+4.  
+```
+  // 用于创建Service的代理对象的工厂
+  public class BeanFactory {
+    private IAccountService accountService;
+    
+    public void setAccountService(IAccountService accountService) {
+      this.accountService = accountService;
+    }
+    
+    // 获取Service代理对象
+    public IAccountService getAccountService() {
+      Proxy.newProxyInstance(accountService.getClass().getClassLoader(),
+        accountService.getClass().getInterfaces(),
+        new InvocationHandler() {
+          @Override
+        }
+      );
+    }
+  }
+```
