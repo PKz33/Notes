@@ -723,3 +723,218 @@ c. 当测试方法执行时，没有`ioc`容器，写了`@Autowired`注解也无
     }
   }
 ```
+- **案例中添加转账方法并引入事务**  
+1. 添加转账方法  
+```
+  @Override
+  public void transfer(String sourceNmae, String targetName, Float money) {
+    // 1. 根据名称查询转出账户
+    Account source = accountDao.findAccountByName(sourceName);
+    // 2. 根据名称查询转入账户
+    Account target = accountDao.findAccountByName(targetName);
+    // 3. 转出账户减钱
+    source.setMoney(source.getMoney()-money);
+    // 4. 转入账户加钱
+    target.setMoney(target.getMoney()+money);
+    // 5. 更新转出账户
+    accountDao.updateAccount(source);
+    
+    // 手动异常，则执行转账操作数据将不一致
+    int i = 1 / 0;
+    
+    // 6. 更新转入账户
+    accountDao.updateAccount(target);
+  }
+  
+  // 和连接相关的工具类
+  public class ConnectionUtils {
+    private ThreadLocal<Connection> tl = new ThreadLocal<Connection>();
+    
+    private DataSource dataSource;
+    
+    public void setDataSource(DataSource dataSource) {
+      this.dataSource = dataSource;
+    }
+    
+    // 获取当前线程上的连接
+    public Connection getThreadConnection() {
+      try {
+        // 1. 先从ThreadLocal上获取
+        Connection conn = tl.get();
+        // 2. 判断当前线程上是否有连接
+        if (conn == null) {
+          // 3. 从数据源中获取一个连接，并且存入ThreadLocal中
+          conn = dataSource.getConnection();
+          tl.set(conn);
+        }
+        // 4. 返回当前线程上的连接
+        return conn;
+      }catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+    
+    public void removeConnection() {
+      tl.remove();
+    }
+  }
+  
+  // 和事务管理相关的工具类，包含开启事务，提交事务，回滚事务和释放连接
+  public class TransactionManager {
+    private ConnectionUtils connectionUtils;
+    
+    public void setConnectionUtils(ConnectionUtils connectionUtils) {
+      this.connectionUtils = connectionUtils;
+    }
+    
+    // 开启事务
+    public void beginTransaction() {
+      try {
+        connectionUtils.getThreadConnection().setAutoCommit(false);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    // 提交事务
+    public void commit() {
+      try {
+        connectionUtils.getThreadConnection().commit();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    // 回滚事务
+    public void rollback() {
+      try {
+        connectionUtils.getThreadConnection().rollback();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    // 释放连接
+    public void release() {
+      try {
+        connectionUtils.getThreadConnection().close(); // 还回连接池中
+        connectionUtils.removeConnection();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+  }
+  
+  
+  // 事务控制应该都是在业务层
+  public class AccountServiceImpl implements IAccountService {
+    private IAccountDao acountDao;
+    private TransactionManager txManager;
+    
+    // 省略getter和setter
+    
+    @Override
+    public List<Account> findAllAccount() {
+      try {
+        // 1. 开启事务
+        txManager.beginTransaction();
+        // 2. 执行操作
+        List<Account> accounts = accountDao.findAllAccount();
+        // 3. 提交事务
+        txManager.commit();
+        // 4. 返回结果
+        return accounts;
+      } catch (Exception e) {
+        // 5. 回滚操作
+        txManager.rollback();
+      } finally {
+        // 6. 释放连接
+        txManager.release();
+      }
+    }
+    
+    @Override
+    public void transfer(String sourceName, String targetName, Float money) {
+      try {
+        // 1. 开启事务
+        txManager.beginTransaction();
+        // 2. 执行操作
+        // 2.1 根据名称查询转出账户
+        Account source = accountDao.findAccountByName(sourceName);
+        // 2.2 根据名称查询转入账户
+        Account target = accountDao.findAccountByName(targetName);
+        // 2.3 转出账户减钱
+        source.setMoney(source.getMoney()-money);
+        // 2.4 注入账户加钱
+        target.setMoney(target.getMoney()+money);
+        // 2.5 更新转出账户
+        accountDao.updateAccount(source);
+        
+        int i = 1 / 0;
+        
+        // 2.6 更新转入账户
+        accountDao.updateAccount(target);
+        // 3. 提交事务
+        txManager.commit();
+      } catch (Exception e) {
+        // 4. 回滚操作
+        txManager.rollback();
+      } finally {
+        // 5. 释放连接
+        txManager.release();
+      }
+    }
+  }
+  
+  
+  <!-- 配置QueryRunner -->
+  <!-- 同上，省略 -->
+  
+  
+  public class AccountDaoImpl implements IAccountDao {
+    private QueryRunner runner;
+    private ConnectionUtils connectionsUtils;
+    
+    public void setRunner(QueryRunner runner) {
+      this.runner = runner;
+    }
+    
+    @Override
+    public List<Account> findAllAccount() {
+      try {
+        return runner.query("select * from account");
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  
+  <!-- 配置Connection的工具类ConnectionUtils -->
+  <bean id="connectionUtils" class="com.pkz.utils.ConnectionUtils">
+    <!-- 注入数据源 -->
+    <property name="dataSource" ref="dataSource"></property>
+  </bean>
+  
+  <!-- 配置Dao对象 -->
+  <bean id="accountDao" class="com.pkz.dao.impl.AccountDaoImpl">
+    <!-- 注入QueryRunner -->
+    <property name="runner" ref="runner"></property>
+    <!-- 注入ConnectionUtils -->
+    <property name="connectionUtils" ref="connectionUtils"></property>
+  </bean>
+  
+  <!-- 配置事务管理器 -->
+  <bean id="txManager" class="com.pkz.utils.TransactionManager">
+    <!-- 注入ConnectionUtils -->
+    <property name="connectionUtils" ref="connectionUtils"></property>
+  </bean>
+  
+  <!-- 配置Service -->
+  <bean id="accountService" class="com.pkz.service.impl.AccountServiceImpl">
+    <!-- 注入dao -->
+    <property name="accountDao" ref="accountDao"></property>
+    <!-- 注入事务管理器 -->
+    <property name="txManager" ref="txManager"></property>
+  </bean>
+```
