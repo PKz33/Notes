@@ -112,12 +112,46 @@ c. `create`方法的参数：
 ```
 4.  
 ```
+  <!-- 配置文件 -->
+  <!-- 配置代理的service -->
+  <bean id="proxyAccountService" factory-bean="beanFactory" factory-method="getAccountService"></bean>
+  
+  <!-- 配置beanfactory -->
+  <bean id="beanFactory" class="com.pkz.factory.BeanFactory">
+    <!-- 注入service -->
+    <property name="accountService" ref="accountService"></property>
+    <!-- 注入事务管理器 -->
+    <property name="txManager" ref="txManager"></property>
+  </bean>
+  
+  <!-- 配置service -->
+  <bean id="accountService" class="com.pkz.service.impl.AccountServiceImpl">
+    <!-- 注入dao -->
+    <property name="accountDao" ref="accountDao"></property>
+  </bean>
+  
+  <!-- 配置Dao对象 -->
+  <bean id="accountDao" class="com.pkz.dao.impl.AccountDaoImpl">
+    <!-- 注入QueryRunner -->
+    <property name="runner" ref="runner"></property>
+  </bean>
+  
+  <!-- 配置QueryRunner -->
+  <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="protorype"></bean>
+  
+
   // 用于创建Service的代理对象的工厂
   public class BeanFactory {
     private IAccountService accountService;
     
-    public void setAccountService(IAccountService accountService) {
+    private TransactionManager txManager;
+    
+    public final void setAccountService(IAccountService accountService) {
       this.accountService = accountService;
+    }
+    
+    public void setTxManager(TransactionManager txManager) {
+      this.txManager = txManager;
     }
     
     // 获取Service代理对象
@@ -126,8 +160,80 @@ c. `create`方法的参数：
         accountService.getClass().getInterfaces(),
         new InvocationHandler() {
           @Override
-        }
-      );
+          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable{
+            Object rtValue = null;
+            try {
+              // 1. 开启事务
+              txManager.beginTransaction();
+              // 2. 执行操作
+              rtValue = method.invoke(accountService, args);
+              // 3. 提交事务
+              txManager.commit();
+              // 4. 返回结果
+              return rtValue;
+            } catch(Exception e) {
+              // 5. 回滚操作
+              txManager.rollback();
+              throw new RuntimeException(e);
+            } finally {
+              // 6. 释放连接
+              txManager.release();
+            }
+          }
+      });
+    }
+  }
+  
+  // 使用Junit单元测试，测试配置
+  @RunWith(SpringJUnit4ClassRunner.class)
+  @ContextConfiguration(locations = "classpath:bean.xml")
+  public class AccountServiceTest {
+    @Autowired
+    @Qualifier("proxyAccountService")
+    private IAccountService as;
+    
+    @Test
+    public void testTransfer() {
+      as.transfer("aaa", "bbb", 1000f);
+    }
+  }
+```
+- **面向切面编程**  
+1. AOP，通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术  
+2. AOP作用：在程序运行期间，不修改源码对已有方法进行增强  
+3. AOP优势：减少重复代码；提高开发效率；维护方便  
+4. AOP实现方式：使用动态代理技术  
+5.   
+Advice（通知/增强）：指拦截到Joinpoint之后所要做的事情就是通知，通知分为前置通知，后置通知，异常通知，最终通知，环绕通知  
+Aspect（切面）：是切入点和通知（引介）的结合  
+```
+  // 只是连接点，但不是切入点，因为没有被增强
+  void test();
+  
+  // 整个invoke方法在执行就是环绕通知
+  @Override
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    if("test".equals(method.getName())) {
+      return method.invoke(accountService, args);
+    }
+    
+    Object rtValue = null;
+    try {
+      // 1. 开启事务
+      txManager.beginTransaction(); // 前置通知
+      // 2. 执行操作
+      rtValue = method.invoke(accountService, args); // 在环绕通知中有明确的切入点方法调用
+      // 3. 提交事务
+      txManager.commit(); // 后置通知
+      // 4. 返回结果
+      return rtValue;
+    } catch (Exception e) {
+      // 5. 回滚操作
+      txManager.rollback(); // 异常通知
+      throw new RuntimeException(e);
+    } finally {
+      // 6. 释放连接
+      txManager.release(); // 最终通知
     }
   }
 ```
