@@ -237,3 +237,59 @@ Aspect（切面）：是切入点和通知（引介）的结合
     }
   }
 ```
+6.  
+```
+  <dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+    <version>1.8.7</version>
+  </dependency>
+  
+  // 账户的业务层接口
+  public interface IAccountService {
+    void saveAccount();
+  }
+  
+  // 账户的业务层实现类
+  public class AccountServiceImpl implements IAccountService {
+    @Override
+    public void saveAccount() {
+      System.out.println("执行保存");
+    }
+  }
+  
+  // 用于记录日志的工具类，提供了公共的代码
+  public class Logger {
+    // 用于打印日志：计划让其在切入点方法执行之前执行（切入点方法就是业务层方法）
+    public void printLog() {
+      System.out.println("Logger类中的printLog方法开始记录日志");
+    }
+  }
+  
+  <beans>
+    <!-- 配置spring的IOC，把service对象配置进来 -->
+    <bean id="accountService" class="com.pkz.service.impl.AccountServiceImpl"></bean>
+    
+    <!--
+      spring中基于XML的AOP配置步骤：
+      1. 把通知Bean也交给spring管理  
+      2. 使用aop:config标签表明开始AOP的配置 
+      3. 使用aop:aspect标签表明配置切面
+          id属性：是给切面提供一个唯一标识
+          ref属性：是指定通知类bean的id
+      4. 在aop:aspect标签的内部使用对应标签配置通知的类型  
+          示例让printLog方法在切入点方法执行之前执行，所以是前置通知
+    -->
+    
+    <!-- 配置Logger类 -->
+    <bean id="logger" class="com.pkz.utils.Logger"></bean>
+    
+    <!-- 配置AOP -->
+    <aop:config>
+      <aop:aspect id="logAdvice" ref="logger">
+        <aop:before method="printLog"></aop:before>
+      </aop:aspect>
+    </aop:config>
+    
+  </beans>
+```
