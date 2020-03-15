@@ -418,3 +418,308 @@ b. `@PostConstruct`用于指定初始化方法
     System.out.println("销毁方法执行");
   }
 ```
+- **IOC案例**  
+1. 导入依赖
+```
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>5.0.2.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-dbutils</groupId>
+      <artifactId>commons-dbutils</artifactId>
+      <version>1.4</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.1.2</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+    </dependency>
+  </dependencies>
+  
+  // 账户的业务层接口
+  public interface IAccountService {
+    List<Account> findAllAccount();
+    
+    void saveAccount(Account account);
+  }
+  
+  // 账户实体类
+  public class Account implements Serializable {
+    private Integer id;
+    private String name;
+    private Float money;
+    
+    // 省略getter和setter
+  }
+  
+  // 账户业务层实现类
+  public class AccountServiceImpl implements IAccountService {
+    private IAccountDao accountDao;
+    
+    public void setAccountDao(IAccountDao accountDao) {
+      this.accountDao = accountDao;
+    }
+    
+    @Override
+    public List<Account> findAllAccount() {
+      return accountDao.findAllAccount();
+    }
+    
+    @Override
+    public void saveAccount(Account account) {
+      accountDao.saveAccount(account);  
+    }
+  }
+  
+  // 账户持久层接口
+  public interface IAccountDao {
+    List<Account> findAllAccount();
+    void saveAccount(Account account);
+  }
+  
+  // 账户持久层实现类
+  public class AccountDaoImpl implements IAccountDao {
+    private QueryRunner runner;
+    
+    public void setRunner(QueryRunner runner) {
+      this.runner = runner;
+    }
+  
+    @Override
+    public List<Account> findAllAccount() {
+      try {
+        return runner.query("select * from account", new BeanListHandler<Account>(Account.class));
+      }catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+    
+    @Override
+    public void saveAccount(Account account) {
+      try {
+        runner.update("insert into account(name, money) values(?, ?)", account.getName(), account.getMoney);
+      }catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  
+  
+  <!-- 配置Service -->
+  <bean id="accountService" class="com.pkz.service.impl.AccountServiceImpl">
+    <!-- 注入dao -->
+    <property name="accountDao" ref="accountDao"></property>
+  </bean>
+  
+  <!-- 配置Dao对象 -->
+  <bean id="accountDao" class="com.pkz.dao.impl.AccountDaoImpl">
+    <!-- 注入QueryRunner -->
+    <property name="runner" ref="runner"></property>
+  </bean>
+  
+  <!-- 配置QueryRunner -->
+  <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+    <!-- 注入数据源 -->
+    <constructor-arg name="ds" ref="dataSource"></constructor-arg>
+  </bean>
+  
+  <!-- 配置数据源 -->
+  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <!-- 连接数据库的必备信息 -->
+    <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+    <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/db"></property>
+    <property name="user" value="root"></property>
+    <property name="password" value="1234"></property>
+  </bean>
+  
+  
+  @Test
+  public void testFindAll() {
+    // 1. 获取容器
+    ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml");
+    // 2. 获得业务层对象
+    IAccountService as = ac.getBean("accountService", IAccountService.class);
+    // 3. 执行方法
+    List<Account> accounts = as.findAllAccount();
+    // 4. 遍历结果...
+  }
+  
+  
+  // 基于注解
+  @Service("accountService")
+  public class AccountServiceImpl implements IAccountService {}
+  @Repository("accountDao")
+  public class AccountDaoImpl implements IAccountDao {
+    @Autowired
+    private QueryRunner runner;
+  }
+  
+  <!-- 告知spring在创建容器时要扫描的包 -->
+  <context:component-scan base-package="com.pkz"></context:component-scan>
+  
+  <!-- 配置QueryRunner -->
+  <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+    <!-- 注入数据源 -->
+    <constructor-arg name="ds" ref="dataSource"></constructor-arg>
+  </bean>
+  
+  <!-- 配置数据源 -->
+  <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <!-- 连接数据库的必备信息 -->
+    <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+    <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/db"></property>
+    <property name="user" value="root"></property>
+    <property name="password" value="1234"></property>
+  </bean>
+  
+  
+  // 进一步简化配置文件
+  /**
+   * 该类是一个配置类，作用和bean.xml一样
+   * spring中的注解
+   * @Configuration：指定当前类是一个配置类
+   *    当配置类作为AnnotationConfigApplicationContext对象创建的参数时，该注解可以不写
+   * @ComponentScan：用于指定spring在创建容器时要扫描的包
+   *    属性：value，和basePackages的作用一样，用于指定创建容器时要扫描的包
+   *    使用此注解等同于在xml文件中配置了：<context:component-scan base-package="com.pkz"></context:component-scan>
+   * @Bean：用于把当前方法的返回值作为bean对象存入spring的ioc容器中
+   *    属性：name，用于指定bean的id，不写时，默认值是当前方法的名称
+   *    使用注解配置方法时，如果方法有参数，spring框架会去容器中查找有没有可用的bean对象，查找方式和Autowired注解的作用一样
+   */
+  @Configuration
+  @ComponentScan(basePackages = {"com.pkz"})
+  // @ComponentScan(basePackages = "com.pkz")
+  // @ComponentScan("com.pkz")
+  public class SpringConfiguration {
+    // 创建一个QueryRunner对象
+    @Bean(name = "runner")
+    @Scope("prototype")
+    public QueryRunner createQueryRunner(DataSource dataSource) {
+      return new QueryRunner(dataSource);
+    }
+    
+    // 创建数据源对象
+    @Bean(name = "dataSource")
+    public DataSource createDataSource() {
+      try {
+        ComboPooledDataSource ds = new ComboPooledDataSource();
+        ds.setDriverClass("com.mysql.jdbc.Driver");
+        ds.setJdbcUrl("jdbc:mysql://localhost:3306/db");
+        ds.setUser("root");
+        ds.setPassword("1234");
+        return ds;
+      }catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  
+  
+  // 进一步将和spring连接数据库相关的内容抽取为配置类
+  public class JdbcConfig {
+    // 创建一个QueryRunner对象
+    @Bean(name = "runner")
+    @Scope("prototype")
+    public QueryRunner createQueryRunner(DataSource dataSource) {
+      return new QueryRunner(dataSource);
+    }
+    
+    // 创建数据源对象
+    @Bean(name = "dataSource")
+    public DataSource createDataSource() {
+      try {
+        ComboPooledDataSource ds = new ComboPooledDataSource();
+        ds.setDriverClass("com.mysql.jdbc.Driver");
+        ds.setJdbcUrl("jdbc:mysql://localhost:3306/db");
+        ds.setUser("root");
+        ds.setPassword("1234");
+        return ds;
+      }catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  
+  // @Import用于导入其他的配置类
+  //    属性value：用于指定其他配置类的字节码，有@Import注解的类为父配置类，导入的是子配置类
+  @ComponentScan("com.pkz")
+  @Import(JdbcConfig.class)
+  public class SpringConfiguration {}
+  
+  
+  // 进一步简化
+  public class JdbcConfig {
+    @Value("${jdbc.driver}")
+    private String driver;
+    
+    @Value("${jdbc.url}")
+    private String url;
+    
+    @Value("${jdbc.username}")
+    private String username;
+    
+    @Value("${jdbc.password}")
+    private String password;
+    
+    // 创建QueryRunner对象...
+  }
+  
+  // @PropertySource：用于指定properties文件的位置
+  //    属性value：指定文件的名称和路径，关键字classpath表示类路径下
+  @ComponentScan("com.pkz")
+  @Import(JdbcConfig.class)
+  @PropertySource("classpath:jdbcConfig.properties")
+  public class SpringConfiguration {}
+```
+- **spring整合junit**
+1. 问题：  
+a. `junit`单元测试中，没有`main`方法也能执行。`junit`集成一个`main`方法，该方法会判断当前测试类中哪些方法中有`@Test`注解，并让他们执行  
+b. 在执行测试方法时，`junit`不知道是不是使用了`spring`框架，所以不会读取配置文件/配置类创建`spring`核心容器  
+c. 当测试方法执行时，没有`ioc`容器，写了`@Autowired`注解也无法实现注入  
+2. 解决：  
+```
+  <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+    <version>5.0.2.RELEASE</version>
+  </dependency>
+
+  // Spring整合junit的配置
+  //    1. 导入spring整合junit的jar（坐标）  
+  //    2. 使用junit提供的注解把原有的main方法替换为spring提供的
+  //        @RunWith
+  //    3. 告知spring的运行器，spring和ioc创建是基于xml还是注解的，并且说明位置
+  //        @ContextConfiguration
+  //            locations：指定xml文件的位置，加上classpath关键字，表示在类路径下
+  //            classes：指定注解类所在的位置
+  // 使用spring 5.x版本的时候，要求junit的jar必须是4.12及以上
+  @RunWith(SpringJUnit4ClassRunner.class)
+  @ContextConfiguration(classes = SpringConfiguration.class)
+  // @ContextConfiguration(locations = "classpath:bean.xml")
+  public class AccountServiceTest {
+    @Autowired
+    private IAccountService as;
+    
+    @Test
+    public void testFindAll() {
+    
+    }
+  }
+```
