@@ -264,6 +264,28 @@ Aspect（切面）：是切入点和通知（引介）的结合
     public void printLog() {
       System.out.println("Logger类中的printLog方法开始记录日志");
     }
+    
+    // 问题：配置环绕通知之后，切入点方法没有执行，而通知方法执行了
+    // 分析：通过对比动态代理中的环绕通知代码，发现动态代理的环绕通知有明确的切入点方法调用，而当前代码中没有
+    // 解决：Spring框架提供了一个接口：ProceedingJoinPoint，该接口有一个方法proceed()，此方法就相当于明确调用切入点方法
+    //       该接口可以作为环绕通知的方法参数，在程序执行时，spring框架会提供该接口的实现类
+    // spring中的环绕通知是框架提供的一种可以在代码中手动控制增强方法何时执行的方式
+    public void aroundPrintLog(ProceedingJoinPoint pjp) {
+      Object rtValue = null;
+      try {
+        Object[] args = pjp.getArgs(); // 得到方法执行所需的参数
+        System.out.println("Logger类中的aroundPrintLog方法开始记录日志---前置");
+        rtValue = pjp.proceed(args); // 明确调用业务层方法（切入点方法）
+        System.out.println("Logger类中的aroundPrintLog方法开始记录日志---后置");
+        return rtValue;
+      }catch (Throwable t) {
+        System.out.println("Logger类中的aroundPrintLog方法开始记录日志---异常");
+        throw new RuntimeException(t);
+      }finally {
+        System.out.println("Logger类中的aroundPrintLog方法开始记录日志---最终");
+      }
+      System.out.println("Logger类中的aroundPrintLog方法开始记录日志");
+    }
   }
   
   <beans>
@@ -278,7 +300,25 @@ Aspect（切面）：是切入点和通知（引介）的结合
           id属性：是给切面提供一个唯一标识
           ref属性：是指定通知类bean的id
       4. 在aop:aspect标签的内部使用对应标签配置通知的类型  
-          示例让printLog方法在切入点方法执行之前执行，所以是前置通知
+          示例让printLog方法在切入点方法执行之前执行，所以是前置通知  
+          aop:before：表示配置前置通知
+          method属性：用于指定Logger类中哪个方法是前置通知
+          pointcut属性：用于指定切入点表达式，该表达式的含义指的是对业务层中哪些方法增强
+      5. 切入点表达式的写法：
+          关键字：execution(表达式)
+          表达式：访问修饰符 返回值 包名.包名.包名...类名.方法名(参数列表)
+          标准的表达式写法：public void com.pkz.service.impl.AccountServiceImpl.saveAccount()
+          访问修饰符可以省略：void com.pkz.service.impl.AccountServiceImpl.saveAccount()
+          返回值可以使用通配符，表示任意返回值：* com.pkz.service.impl.AccountServiceImpl.saveAccount()
+          包名可以使用通配符，表示任意包，但是有几级包，就需要写几个*
+          包名可以使用..表示当前包及其子包* *..AccountServiceImpl.saveAccount()
+          类名和方法名可以使用*实现通配* *..*.*()
+          参数列表：
+              可以直接写数据类型：基本数据类型直接写名称，如int；引用类型写包名.类名的方式，如java.lang.String
+              可以使用通配符表示任意类型，但是必须有参数
+              可以使用..表示有无参数均可，有参数可以是任意类型
+          全通配写法：* *..*.*(..)
+          实际开发中切入点表达式的通常写法：切到业务层实现类下的所有方法 * com.pkz.service.impl.*.*(..)
     -->
     
     <!-- 配置Logger类 -->
@@ -287,9 +327,96 @@ Aspect（切面）：是切入点和通知（引介）的结合
     <!-- 配置AOP -->
     <aop:config>
       <aop:aspect id="logAdvice" ref="logger">
-        <aop:before method="printLog"></aop:before>
+        <!-- 配置通知的类型，并建立通知方法和切入点方法的关联 -->
+        <aop:before method="printLog" pointcut="execution(public void com.pkz.service.impl.AccountServiceImpl.saveAccount())">
+        </aop:before>
       </aop:aspect>
     </aop:config>
     
   </beans>
+  
+  // 测试AOP的配置
+  public class AOPTest {
+    public static void main(String[] args) {
+      // 1. 获取容器
+      ApplicationContext ac = new ClassPathXmlApplicationContext("bean.xml");
+      // 2. 获取对象
+      IAccountService as = (IAccountService)ac.getBean("accountService");
+      // 3. 执行方法
+      as.saveAccount();
+    }
+  }
+  
+  
+  <aop:config>
+    <!-- 配置切面 -->
+    <aop:aspect id="logAdvice" ref="logger">
+      <!-- 配置前置通知：在切入点方法执行之前执行 -->
+      <aop:before method="beforePrintLog" pointcut="execution(* com.pkz.service.impl.*.*(..))"></aop:before>
+      
+      <!-- 配置后置通知：在切入点方法正常执行之后执行，它和异常通知永远只能执行一个 -->
+      <aop:after-returning method="afterReturningPrintLog" pointcut="execution(* com.pkz.service.impl.*.*(..))"></aop:after-returning>
+      
+      <!-- 配置异常通知：在切入点方法执行产生异常之后执行，它和后置通知永远只能执行一个 -->
+      <aop:after-throwing method="afterThrowingPrintLog" pointcut-ref="pt1"></aop:after-throwing>
+      
+      <!-- 配置最终通知：无论切入点方法是否正常执行它都会在其后面执行 -->
+      <aop:after method="afterPrintLog" pointcut-ref="pt1"></aop:after>
+      
+      <!-- 配置环绕通知 -->
+      <aop:around method="aroundPrintLog" pointcut-ref="pt1"></aop:around>
+      
+      <!--
+        配置切入点表达式，id属性用于指定表达式的唯一标识，expression属性用于指定表达式内容
+        此标签写在aop:aspect标签内部只能当前切面使用
+        写在aop:aspect外面，就代表所有切面可用，若放在外面，有约束条件：写在切面之前（位置）
+      -->
+      <aop:pointcut id="pt1" expression="execution(* com.pkz.service.impl.*.*(..))"></aop:pointcut>
+    </aop:aspect>
+  </aop:config>
+```
+- **基于注解的AOP配置**
+1.
+```
+  <!-- 配置spring创建容器时要扫描的包 -->
+  <context:component-scan base-package="com.pkz"></context:component-scan>
+  
+  <!-- 配置spring开启注解AOP的支持 -->
+  <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+  
+  @Component("logger")
+  @Aspect // 表示当前类是一个切面类
+  public class Logger {
+  
+    @Pointcut("execution(* com.pkz.service.impl.*.*(..))")
+    private void pt1(){}
+  
+    // 前置通知
+    @Before("pt1()")
+    public void beforePrintLog(){}
+    
+    // 后置通知
+    @AfterReturning("pt1()")
+    public void afterReturningPrintLog(){}
+    
+    // 异常通知
+    @AfterThrowing("pt1()")
+    public void afterThrowingPrintLog(){}
+    
+    // 最终通知
+    @After("pt1()")
+    public void afterPrintLog(){}
+    
+    // 环绕通知
+    @Around("pt1()")
+    public Object aroundPrintLog(ProceedingJoinPoint pjp){ ... }
+  }
+```
+2. 不使用XML的配置方式
+```
+  @Configuration
+  @ComponentScan(basePackages="com.pkz")
+  @EnableAspectJAutoProxy
+  public class SpringConfiguration {
+  }
 ```
