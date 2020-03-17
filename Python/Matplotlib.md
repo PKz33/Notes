@@ -43,6 +43,8 @@ y_city1 = [random.uniform(15, 18) for i in x]
 y_city2 = [random.uniform(1,3) for i in x]
 
 # 2. 创建画布
+# figsize：画布大小
+# dpi：dot per inch，图像的清晰度
 plt.figure(figsize=(20, 8), dpi=80)
 
 # 3. 绘制图像
