@@ -25,6 +25,8 @@
 - [AOP](./Spring/AOP.md)
 # 算法
 - [笔试面试题](./算法/笔试面试题.md)
+- [剑指offer](./算法/剑指offer.md)
+- [LeetCode](./算法/LeetCode.md)
 # 网络
 - [计算机网络](./网络/计算机网络.md)
 # Python
