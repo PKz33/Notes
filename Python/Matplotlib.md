@@ -117,4 +117,142 @@ axes[1].set_title("Temperature between 11 and 12")
 # 显示
 plt.show()
 ```  
-![](./Pics/折线图3.png)
+![](./Pics/折线图3.png)  
+4. 绘制函数图像  
+```
+import numpy as np
+
+# 1. 准备x，y数据
+x = np.linspace(-1, 1, 1000)
+y = 2 * x * x
+
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=80)
+
+# 3. 绘制图像
+plt.plot(x, y)
+
+# 添加网格显示
+plt.grid(linestyle="--", alpha=0.5)
+
+# 4. 显示图像
+plt.show()
+```  
+![](./Pics/折线图4.png)  
+- **散点图的绘制与显示**   
+```
+import random
+
+# 1. 准备数据
+x = [random.uniform(100, 200) for i in range(100)]
+y = [random.uniform(100, 200) for i in range(100)]
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=100)
+
+# 3. 绘制散点图
+plt.scatter(x, y)
+
+# 4. 显示图像
+plt.show()
+```  
+![](./Pics/散点图.png)  
+- **柱状图的绘制与显示**  
+1.  
+```
+# 1. 准备数据
+movie_names = ['Thor: Ragnarok', 'Justice League', 'Murder on the Orient Express', 'Sheep Without A Shepherd']  
+tickets = [73853, 57767, 22354, 8716]
+
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=80)
+
+# 3. 绘制柱状图
+x_ticks = range(len(movie_names))
+plt.bar(x_ticks, tickets, color=['b', 'r', 'g', 'y'])
+
+# 修改x刻度
+plt.xticks(x_ticks, movie_names)
+
+# 添加标题
+plt.title("Box office")
+
+# 添加网格显示
+plt.grid(linestyle="--", alpha=0.5)
+
+# 4. 显示图像
+plt.show()
+```  
+![](./Pics/柱状图1.png)  
+2.  
+```
+# 1. 准备数据
+movie_names = ['Thor: Ragnarok', 'Justice League', 'Murder on the Orient Express']
+
+first_day = [10857, 10062, 1275]
+first_weekend = [36224, 34479, 11830]
+
+x = range(len(movie_names))
+
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=100)
+
+# 3. 绘制柱状图
+plt.bar(x, first_day, width=0.2, label="Opening day box office")
+plt.bar([i+0.2 for i in x], first_weekend, width=0.2, label="Weekly box office")
+
+# 显示图例
+plt.legend()
+
+# 修改x轴刻度显示
+plt.xticks([i+0.1 for i in x], movie_names)
+
+# 4. 显示图像
+plt.show()
+```  
+![](./Pics/柱状图2.png)  
+- **直方图的绘制与显示**  
+```
+# 需求：电影时长分布状况
+# 1. 准备数据
+time = [131, 98, 125, 131, 124, 139, 131, 117, 128,108, 135, 138, 131, 102, 107, 114, 119, 124]
+
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=80)
+
+# 3. 绘制直方图
+distance = 2
+group_num = int((max(time) - min(time)) / distance)
+plt.hist(time, bins=group_num, density=True)
+
+# 修改x轴刻度
+plt.xticks(range(min(time), max(time) + 2, distance))
+
+# 添加网格
+plt.grid(linestyle="--", alpha=0.5)
+
+# 4. 显示图像
+plt.show()
+```  
+![](./Pics/直方图.png)  
+- **饼图的绘制与显示**  
+```
+# 1. 准备数据
+movie_name = ['Thor: Ragnarok', 'Justice League', 'Murder on the Orient Express', 'Sheep Without A Shepherd']  
+place_count = [60605, 54546, 45819, 28243]
+
+# 2. 创建画布
+plt.figure(figsize=(20, 8), dpi=80)
+
+# 3. 绘制饼图
+plt.pie(place_count, labels=movie_name, colors=['b', 'r', 'g', 'y'], autopct="%1.2f%%")
+
+# 显示图例
+plt.legend()
+
+# 调整横轴纵轴比例
+plt.axis('equal')
+
+# 4. 显示图像 
+plt.show()
+```   
+![](./Pics/饼图.png)
