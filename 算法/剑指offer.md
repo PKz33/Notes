@@ -58,3 +58,15 @@
     return res;
   }
 ```
+- **连续子数组的最大和**  
+```
+  public int FindGreatestSumOfSubArray(int[] array) {
+    int sum = 0;
+    int res = Integer.MIN_VALUE;
+    for(int num : array) {
+      sum = sum <= 0 ? num : sum + num;
+      res = Math.max(res, sum);
+     }
+     return res;
+  }
+```
