@@ -45,3 +45,16 @@
     return res;
   }
 ```
+- **二进制中1的个数**  
+1. 解题思路：`n & (n-1)`，将最右边的一个1变为0，其左边保持不变  
+2. 代码实现：  
+```
+  public int NumberOf1(int n) {
+    int res = 0;
+    while(n!=0) {
+      res++;
+      n &= (n-1);
+    }
+    return res;
+  }
+```
