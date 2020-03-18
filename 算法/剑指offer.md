@@ -71,6 +71,7 @@
   }
 ```
 - **二叉树的镜像**  
+```
 public void Mirror(TreeNode root) {
   if(root == null) {
     return;
@@ -86,3 +87,4 @@ public void Mirror(TreeNode root) {
     Mirror(root.right);  
   }
 }
+```
