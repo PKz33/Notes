@@ -31,3 +31,4 @@
 - [计算机网络](./网络/计算机网络.md)
 # Python
 - [Matplotlib](./Python/Matplotlib.md)
+- [Numpy](./Python/Numpy.md)
