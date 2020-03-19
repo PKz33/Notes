@@ -88,3 +88,43 @@ public void Mirror(TreeNode root) {
   }
 }
 ```
+- **字符流中第一个不重复的字符**    
+解题思路：创建一个标记数组记录每个字符的出现次数，创建一个队列，字符流边进边出（当遍历的当前字符重复出现时，出队）
+```
+Queue<Character> queue = new LinkedList<>();
+int[] cnt = new int[128];
+
+public void Insert(char ch) {
+  cnt[ch]++；
+  queue.add(ch);
+  while(!queue.isEmpty() && cnt[queue.peek()] > 1) {
+    queue.poll();
+  }
+}
+
+public char FirstAppearingOnce() {
+  return queue.isEmpty() ? '#' : queue.peek(); 
+}
+```  
+- **数组中出现次数超过一半的数字**   
+解题思路：“攻守阵地”思想
+```
+public int MoreThanHalfNum_Solution(int[] nums) {
+  int index = nums[0];
+  int cnt = 1;
+  for(int i=1; i<nums.length; i++) {
+    cnt = nums[i] == index ? cnt+1 : cnt-1;
+    if(cnt == 0) {
+      index = nums[i];
+      cnt = 1;
+    }
+  }
+  cnt = 0;
+  for(int num : nums) {
+    if(num == index) {
+      cnt++;
+    }
+  }
+  return cnt > nums.length/2 ? index : 0;
+}
+```
