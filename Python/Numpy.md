@@ -140,6 +140,16 @@ stock_change.resize((10, 8))
 
 # 转置
 stock_change.T
+
+a = np.array([[1,2,3,4], [5,6,7,8]])
+a.shape  # (2, 4)
+a.reshape((-1, 2))
+'''
+array([[1, 2],
+       [3, 4],
+       [5, 6],
+       [7, 8]])
+'''
 ```  
 7. 类型修改  
 ```
@@ -307,8 +317,8 @@ b. `shape`（其中相对应的一个地方为1）
 ```
 '''
 例如：
-Image（3d array）： 256 x 256 x 3
-Scale（1d array）：             3
+Image （3d array）：256 x 256 x 3
+Scale （1d array）：            3
 Result（3d array）：256 x 256 x 3
 
 A     （4d array）: 9 x 1 x 7 x 1
