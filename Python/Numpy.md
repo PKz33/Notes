@@ -523,10 +523,10 @@ id,value1,value2,value3
 data = np.genfromtxt("test.csv", delimiter=",")
 data
 '''
-array([[nan,   nan,  nan,  nan],
-       [1. , 123. ,  1.4, 23. ],
-       [2. , 110. ,  nan, 18. ],
-       [3. ,   nan,  2.1, 19. ]])
+array([[nan,   nan,  nan,   nan],
+       [1. , 123. ,  1.4,  23. ],
+       [2. , 110. ,  nan,  18. ],
+       [3. ,   nan,  2.1,  19. ]])
 '''
 
 type(data[2, 2])  # numpy.float64
