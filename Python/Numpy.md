@@ -68,5 +68,5 @@ data.dtype  # dtype('float64')
 # 创建数组的时候指定类型
 np.array([1.1, 2.2, 3.3], dtype="float32")  # array([1.1, 2.2, 3.3], dtype=float32)
 
-np.array([1.1, 2.2, 3.3], dtype=np.float32)  array([1.1, 2.2, 3.3], dtype=float32)
+np.array([1.1, 2.2, 3.3], dtype=np.float32)  # array([1.1, 2.2, 3.3], dtype=float32)
 ```
