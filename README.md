@@ -32,3 +32,4 @@
 # Python
 - [Matplotlib](./Python/Matplotlib.md)
 - [Numpy](./Python/Numpy.md)
+- [Pandas](./Python/Pandas.md)
