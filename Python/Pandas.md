@@ -588,3 +588,78 @@ Name: p_change, dtype: float64
 '''
 ```  
 ![](./Pics/Pandas2.png)
+- **自定义运算**  
+```
+data.apply(lambda x: x.max() - x.min())
+'''
+open               122.00
+high                23.68
+close               22.85
+low                 21.81
+volume          500757.29
+price_change         6.55
+p_change            20.06
+turnover            12.52
+dtype: float64
+'''
+
+data["volume"].max() - data["volume"].min()  # 500757.29
+
+data.plot(x="p_change", y="turnover", kind="scatter")
+
+data.plot(x="volume", y="turnover", kind="scatter")
+```  
+![](./Pics/Pandas3.png)
+![](./Pics/Pandas4.png)  
+- **读取csv文件**  
+```
+pd.read_csv("./pandas_demo/stock_day.csv", usecols=["high", "low", "open", "close"]).head()  
+'''
+		open	high	close	low
+2018-02-27	23.53	25.88	24.16	23.53
+2018-02-26	22.80	23.78	23.53	22.80
+2018-02-23	22.88	23.37	22.82	22.71
+2018-02-22	22.25	22.76	22.28	22.02
+2018-02-14	21.49	21.99	21.92	21.48
+'''
+
+pd.read_csv("./pandas_demo/stock_day2.csv", names=["open","high","close","low","name1","name2","name3","name4","name5","name6","name7","name8","name9","name10"]).head()
+'''
+		open	high	close	low	name1	name2	name3	name4	name5	name6	name7	name8	name9	name10
+2018-02-27	23.53	25.88	24.16	23.53	95578.03	0.63	2.68	22.942	22.142	22.875	53782.64	46738.65	55576.11	2.39
+2018-02-26	22.80	23.78	23.53	22.80	60985.11	0.69	3.02	22.406	21.955	22.942	40827.52	42736.34	56007.50	1.53
+2018-02-23	22.88	23.37	22.82	22.71	52914.01	0.54	2.42	21.938	21.929	23.022	35119.58	41871.97	56372.85	1.32
+2018-02-22	22.25	22.76	22.28	22.02	36105.01	0.36	1.64	21.446	21.909	23.137	35397.58	39904.78	60149.60	0.90
+2018-02-14	21.49	21.99	21.92	21.48	23331.04	0.44	2.05	21.366	21.923	23.253	33590.21	42935.74	61716.11	0.58
+'''
+
+# 保存'open'列的数据
+data[:10].to_csv("test.csv", columns=["open"])
+data[:10].to_csv("test.csv", columns=["open"], index=False)
+data[:10].to_csv("test.csv", columns=["open"], index=False, mode="a")
+data[:10].to_csv("test.csv", columns=["open"], index=False, mode="a", header=False)
+```  
+- **HDF5**  
+```
+day_close = pd.read_hdf("./pandas_demo/day_close.h5")
+day_close.to_hdf("test.h5", key="close")
+pd.read_hdf("test.h5", key="close").head()
+
+day_open = pd.read_hdf("./pandas_demo/day_open.h5")
+day_open.to_hdf("test.h5", key="open")
+pd.read_hdf("test.h5", key="close").head()
+```
+- **JSON**  
+```
+sa = pd.read_json("./pandas_demo/Sarcasm_Headlines_Dataset.json", orient="records", lines=True)
+sa.head()
+'''
+
+	article_link	headline	is_sarcastic
+0	https://www.huffingtonpost.com/entry/versace-b...	former versace store clerk sues over secret 'b...	0
+1	https://www.huffingtonpost.com/entry/roseanne-...	the 'roseanne' revival catches up to our thorn...	0
+2	https://local.theonion.com/mom-starting-to-fea...	mom starting to fear son's web series closest ...	1
+3	https://politics.theonion.com/boehner-just-wan...	boehner just wants wife to listen, not come up...	1
+4	https://www.huffingtonpost.com/entry/jk-rowlin...	j.k. rowling wishes snape happy birthday in th...	0
+'''
+```
