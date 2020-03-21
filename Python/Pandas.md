@@ -654,7 +654,6 @@ pd.read_hdf("test.h5", key="close").head()
 sa = pd.read_json("./pandas_demo/Sarcasm_Headlines_Dataset.json", orient="records", lines=True)
 sa.head()
 '''
-
 	article_link	headline	is_sarcastic
 0	https://www.huffingtonpost.com/entry/versace-b...	former versace store clerk sues over secret 'b...	0
 1	https://www.huffingtonpost.com/entry/roseanne-...	the 'roseanne' revival catches up to our thorn...	0
