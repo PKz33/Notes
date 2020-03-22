@@ -860,3 +860,21 @@ data_new.isnull().any()  # 全部返回False说明不存在缺失值了
 dtype: bool
 '''
 ```
+- **数据离散化**  
+1. 数据离散化  
+```
+# 原始数据
+	性别	年龄
+A	1	23
+B	2	30
+C	1	18
+
+# 离散化
+	男	女	年龄
+A	1	0	23
+B	0	1	30
+C	1	0	18
+```  
+2. 离散化步骤：  
+a. 分组：自动分组`sr=pd.qcut(data, bins)`；自定义分组：`sr=pd.cut(data, [])`  
+b. 将分组好的结果转换成`one-hot`编码：`pd.get_dummies(sr, prefix=)`
