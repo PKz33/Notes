@@ -1328,3 +1328,122 @@ AE	AJ	2	2	2	2	2	2	0	0	2	2	2
 	FU	2	2	2	2	2	2	1	0	2	2	2
 '''
 ```
+- **综合案例**
+```
+# 1. 准备数据
+movie = pd.read_csv("./pandas_demo/IMDB-Movie-Data.csv")
+movie.head(1)
+'''
+
+	Rank	Title	Genre	Description	Director	Actors	Year	Runtime (Minutes)	Rating	Votes	Revenue (Millions)	Metascore
+0	1	Guardians of the Galaxy	Action,Adventure,Sci-Fi	A group of intergalactic criminals are forced ...	James Gunn	Chris Pratt, Vin Diesel, Bradley Cooper, Zoe S...	2014	121	8.1	757074	333.13	76.0
+'''
+
+# 问题1：获取这些电影数据中评分的平均分，导演的人数等信息
+# 评分的平均分
+movie["Rating"].mean()  # 6.723200000000003
+
+# 导演的人数
+np.unique(movie["Director"]).size  # 644
+
+# 问题2
+movie["Rating"].plot(kind="hist", figsize=(20, 8))
+
+import matplotlib.pyplot as plt
+# 1) 创建画布
+plt.figure(figsize=(20, 8), dpi=80)
+
+# 2) 绘制直方图
+plt.hist(movie["Rating"], 20)
+
+# 修改刻度
+plt.xticks(np.linspace(movie["Rating"].min(), movie["Rating"].max(), 21))
+
+# 添加网格
+plt.grid(linestyle="--", alpha=0.5)
+
+# 3) 显示图像
+plt.show()
+
+# 问题3：统计电影分类（genre）的情况
+movie["Genre"].head(2)
+'''
+0     Action,Adventure,Sci-Fi
+1    Adventure,Mystery,Sci-Fi
+Name: Genre, dtype: object
+'''
+
+# 先统计电影类别有哪些
+movie_genre = [i.split(",") for i in movie["Genre"]]
+
+for i in range(3):
+    print(movie_genre[i]) 
+'''
+['Action', 'Adventure', 'Sci-Fi']
+['Adventure', 'Mystery', 'Sci-Fi']
+['Horror', 'Thriller']
+'''
+
+movie_class = np.unique([j for i in movie_genre for j in i])
+movie_class
+'''
+array(['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime',
+       'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music',
+       'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Sport', 'Thriller',
+       'War', 'Western'], dtype='<U9')
+'''
+
+# 统计每个类别有几个电影
+count = pd.DataFrame(np.zeros(shape=[1000, 20], dtype="int32"), columns=movie_class)
+count.head()
+'''
+
+	Action	Adventure	Animation	Biography	Comedy	Crime	Drama	Family	Fantasy	History	Horror	Music	Musical	Mystery	Romance	Sci-Fi	Sport	Thriller	War	Western
+0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+3	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+4	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+'''
+
+# 计数填表
+for i in range(1000):
+    count.ix[i, movie_genre[i]] = 1
+count.head()
+'''
+	Action	Adventure	Animation	Biography	Comedy	Crime	Drama	Family	Fantasy	History	Horror	Music	Musical	Mystery	Romance	Sci-Fi	Sport	Thriller	War	Western
+0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0
+1	0	1	0	0	0	0	0	0	0	0	0	0	0	1	0	1	0	0	0	0
+2	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	1	0	0
+3	0	0	1	0	1	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0
+4	1	1	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0
+'''
+
+count.sum(axis=0)
+'''
+Action       303
+Adventure    259
+Animation     49
+Biography     81
+Comedy       279
+Crime        150
+Drama        513
+Family        51
+Fantasy      101
+History       29
+Horror       119
+Music         16
+Musical        5
+Mystery      106
+Romance      141
+Sci-Fi       120
+Sport         18
+Thriller     195
+War           13
+Western        7
+dtype: int64
+'''
+
+count.sum(axis=0).sort_values(ascending=False).plot(kind="bar", figsize=(20, 9), fontsize=20, colormap="cool")
+```
+![](./Pics/电影种类.png)
