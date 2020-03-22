@@ -1276,3 +1276,55 @@ white    5.56
 Name: price1, dtype: float64
 '''
 ```  
+- **星巴克零售店铺数据案例**   
+```
+# 1. 准备数据
+starbucks = pd.read_csv("./pandas_demo/directory.csv")
+starbucks.head(2)
+'''
+
+	Brand	Store Number	Store Name	Ownership Type	Street Address	City	State/Province	Country	Postcode	Phone Number	Timezone	Longitude	Latitude
+0	Starbucks	47370-257954	Meritxell, 96	Licensed	Av. Meritxell, 96	Andorra la Vella	7	AD	AD500	376818720	GMT+1:00 Europe/Andorra	1.53	42.51
+1	Starbucks	22331-212325	Ajman Drive Thru	Licensed	1 Street 69, Al Jarf	Ajman	AJ	AE	NaN	NaN	GMT+04:00 Asia/Dubai	55.47	25.42
+'''
+
+# 按照国家分组，求出每个国家的星巴克零售店数量
+starbucks.groupby("Country").count().head()
+'''
+
+	Brand	Store Number	Store Name	Ownership Type	Street Address	City	State/Province	Postcode	Phone Number	Timezone	Longitude	Latitude
+Country												
+AD	1	1	1	1	1	1	1	1	1	1	1	1
+AE	144	144	144	144	144	144	144	24	78	144	144	144
+AR	108	108	108	108	108	108	108	100	29	108	108	108
+AT	18	18	18	18	18	18	18	18	17	18	18	18
+AU	22	22	22	22	22	22	22	22	0	22	22	22
+'''
+
+starbucks.groupby("Country").count()["Brand"].head()
+'''
+Country
+AD      1
+AE    144
+AR    108
+AT     18
+AU     22
+Name: Brand, dtype: int64
+'''
+
+starbucks.groupby("Country").count()["Brand"].sort_values(ascending=False)[:10].plot(kind="bar", figsize=(20,8), fontsize=40)
+```
+![](./Pics/Starbucks1.png)  
+```
+# 假设加入省市一起进行分组
+starbucks.groupby(by=["Country", "State/Province"]).count().head()
+'''
+		Brand	Store Number	Store Name	Ownership Type	Street Address	City	Postcode	Phone Number	Timezone	Longitude	Latitude
+Country	State/Province											
+AD	7	1	1	1	1	1	1	1	1	1	1	1
+AE	AJ	2	2	2	2	2	2	0	0	2	2	2
+	AZ	48	48	48	48	48	48	7	20	48	48	48
+	DU	82	82	82	82	82	82	16	50	82	82	82
+	FU	2	2	2	2	2	2	1	0	2	2	2
+'''
+```
