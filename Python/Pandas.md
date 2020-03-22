@@ -1046,3 +1046,67 @@ pd.get_dummies(sr, prefix="rise").head()
 2018-02-14	0	0	0	0	1	0	0	0
 '''
 ```
+- **按方向合并**  
+```
+pd.concat([stock, stock_change], axis=1)
+
+pd.concat([stock, stock_change], axis=0)
+```
+- **按索引合并**  
+```
+left = pd.DataFrame({'key1':['K0','K0','K1','K2'],
+                    'key2':['K0','K1','K0','K1'],
+                    'A':['A0','A1','A2','A3'],
+                    'B':['B0','B1','B2','B3']})
+right = pd.DataFrame({'key1':['K0','K1','K1','K2'],
+                    'key2':['K0','K0','K0','K0'],
+                    'C':['C0','C1','C2','C3'],
+                    'D':['D0','D1','D2','D3']})
+		    
+left
+'''
+	A	B	key1	key2
+0	A0	B0	K0	K0
+1	A1	B1	K0	K1
+2	A2	B2	K1	K0
+3	A3	B3	K2	K1
+'''
+
+right
+'''
+	C	D	key1	key2
+0	C0	D0	K0	K0
+1	C1	D1	K1	K0
+2	C2	D2	K1	K0
+3	C3	D3	K2	K0
+'''
+
+pd.merge(left, right, how="inner", on=["key1", "key2"])
+'''
+	A	B	key1	key2	C	D
+0	A0	B0	K0	K0	C0	D0
+1	A2	B2	K1	K0	C1	D1
+2	A2	B2	K1	K0	C2	D2
+'''
+
+pd.merge(left, right, how="left", on=["key1", "key2"])
+'''
+	A	B	key1	key2	C	D
+0	A0	B0	K0	K0	C0	D0
+1	A1	B1	K0	K1	NaN	NaN
+2	A2	B2	K1	K0	C1	D1
+3	A2	B2	K1	K0	C2	D2
+4	A3	B3	K2	K1	NaN	NaN
+'''
+
+pd.merge(left, right, how="outer", on=["key1", "key2"])
+'''
+	A	B	key1	key2	C	D
+0	A0	B0	K0	K0	C0	D0
+1	A1	B1	K0	K1	NaN	NaN
+2	A2	B2	K1	K0	C1	D1
+3	A2	B2	K1	K0	C2	D2
+4	A3	B3	K2	K1	NaN	NaN
+5	NaN	NaN	K2	K0	C3	D3
+'''
+```
