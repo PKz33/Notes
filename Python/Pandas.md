@@ -1205,3 +1205,74 @@ data.div(data.sum(axis=1), axis=0).plot(kind="bar")
 data.div(data.sum(axis=1), axis=0).plot(kind="bar", stacked=True)
 ```
 ![](./Pics/交叉表2.png)
+- **透视表**   
+```
+data.div(data.sum(axis=1), axis=0)
+'''
+pona	0	1
+week		
+0	0.504000	0.496000
+1	0.419847	0.580153
+2	0.462121	0.537879
+3	0.492188	0.507812
+4	0.464567	0.535433
+'''
+
+# 透视表操作
+stock.pivot_table(["pona"], index=["week"])
+'''
+	pona
+week	
+0	0.496000
+1	0.580153
+2	0.537879
+3	0.507812
+4	0.535433
+'''
+```
+- **分组与聚合**  
+```
+col = pd.DataFrame({'color':['white','red','green','red','green'],
+                   'object':['pen','pencil','pencil','ashtray','pen'],
+                   'price1':[5.56,4.20,1.30,0.56,2.75],
+                   'price2':[4.75,4.12,1.60,0.75,3.15]})
+col
+'''
+	color	object	price1	price2
+0	white	pen	5.56	4.75
+1	red	pencil	4.20	4.12
+2	green	pencil	1.30	1.60
+3	red	ashtray	0.56	0.75
+4	green	pen	2.75	3.15
+'''
+
+# 进行分组，对颜色分组，price1进行聚合
+# 用dataframe的方法进行分组
+col.groupby(by="color")["price1"].max()
+'''
+color
+green    2.75
+red      4.20
+white    5.56
+Name: price1, dtype: float64
+'''
+
+col["price1"]
+'''
+0    5.56
+1    4.20
+2    1.30
+3    0.56
+4    2.75
+Name: price1, dtype: float64
+'''
+
+col["price1"].groupby(col["color"]).max()
+'''
+color
+green    2.75
+red      4.20
+white    5.56
+Name: price1, dtype: float64
+'''
+```  
