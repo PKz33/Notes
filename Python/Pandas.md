@@ -662,3 +662,155 @@ sa.head()
 4	https://www.huffingtonpost.com/entry/jk-rowlin...	j.k. rowling wishes snape happy birthday in th...	0
 '''
 ```
+- **缺失值处理**  
+```
+import pandas as pd
+import numpy as np
+
+movie = pd.read_csv("./pandas_demo/IMDB-Movie-Data.csv")
+
+# 1. 判断是否存在缺失值
+movie.head(2)
+'''
+
+Rank	Title	Genre	Description	Director	Actors	Year	Runtime (Minutes)	Rating	Votes	Revenue (Millions)	Metascore
+0	1	Guardians of the Galaxy	Action,Adventure,Sci-Fi	A group of intergalactic criminals are forced ...	James Gunn	Chris Pratt, Vin Diesel, Bradley Cooper, Zoe S...	2014	121	8.1	757074	333.13	76.0
+1	2	Prometheus	Adventure,Mystery,Sci-Fi	Following clues to the origin of mankind, a te...	Ridley Scott	Noomi Rapace, Logan Marshall-Green, Michael Fa...	2012	124	7.0	485820	126.46	65.0
+'''
+
+pd.isnull(movie.head())
+'''
+	Rank	Title	Genre	Description	Director	Actors	Year	Runtime (Minutes)	Rating	Votes	Revenue (Millions)	Metascore
+0	False	False	False	False	False	False	False	False	False	False	False	False
+1	False	False	False	False	False	False	False	False	False	False	False	False
+2	False	False	False	False	False	False	False	False	False	False	False	False
+3	False	False	False	False	False	False	False	False	False	False	False	False
+4	False	False	False	False	False	False	False	False	False	False	False	False
+'''
+
+np.any(pd.isnull(movie))  # True，返回True，说明数据中存在缺失值
+
+pd.notnull(movie.head())
+'''
+
+Rank	Title	Genre	Description	Director	Actors	Year	Runtime (Minutes)	Rating	Votes	Revenue (Millions)	Metascore
+0	True	True	True	True	True	True	True	True	True	True	True	True
+1	True	True	True	True	True	True	True	True	True	True	True	True
+2	True	True	True	True	True	True	True	True	True	True	True	True
+3	True	True	True	True	True	True	True	True	True	True	True	True
+4	True	True	True	True	True	True	True	True	True	True	True	True
+'''
+
+np.all(pd.notnull(movie))  # 返回False，说明数据中存在缺失值  
+
+pd.isnull(movie).any()
+'''
+Rank                  False
+Title                 False
+Genre                 False
+Description           False
+Director              False
+Actors                False
+Year                  False
+Runtime (Minutes)     False
+Rating                False
+Votes                 False
+Revenue (Millions)     True
+Metascore              True
+dtype: bool
+'''
+
+pd.notnull(movie).all()
+'''
+Rank                   True
+Title                  True
+Genre                  True
+Description            True
+Director               True
+Actors                 True
+Year                   True
+Runtime (Minutes)      True
+Rating                 True
+Votes                  True
+Revenue (Millions)    False
+Metascore             False
+dtype: bool
+'''
+
+pd.notnull(movie).any()
+'''
+Rank                  True
+Title                 True
+Genre                 True
+Description           True
+Director              True
+Actors                True
+Year                  True
+Runtime (Minutes)     True
+Rating                True
+Votes                 True
+Revenue (Millions)    True
+Metascore             True
+dtype: bool
+'''
+
+# 2. 缺失值处理
+# 方法1：删除含有缺失值的样本
+data1 = movie.dropna()
+pd.notnull(movie).all()
+'''
+Rank                   True
+Title                  True
+Genre                  True
+Description            True
+Director               True
+Actors                 True
+Year                   True
+Runtime (Minutes)      True
+Rating                 True
+Votes                  True
+Revenue (Millions)    False
+Metascore             False
+dtype: bool
+'''
+
+pd.notnull(data1).all()
+'''
+Rank                  True
+Title                 True
+Genre                 True
+Description           True
+Director              True
+Actors                True
+Year                  True
+Runtime (Minutes)     True
+Rating                True
+Votes                 True
+Revenue (Millions)    True
+Metascore             True
+dtype: bool
+'''
+
+# 含有缺失值的字段
+# Revenue (Millions)
+# Metascore
+movie["Revenue (Millions)"].fillna(movie["Revenue (Millions)"].mean(), inplace=True)
+movie["Metascore"].fillna(movie["Metascore"].mean(), inplace=True)
+
+pd.notnull(movie).all()  # 缺失值已经处理完毕，不存在缺失值
+'''
+Rank                  True
+Title                 True
+Genre                 True
+Description           True
+Director              True
+Actors                True
+Year                  True
+Runtime (Minutes)     True
+Rating                True
+Votes                 True
+Revenue (Millions)    True
+Metascore             True
+dtype: bool
+'''
+```
