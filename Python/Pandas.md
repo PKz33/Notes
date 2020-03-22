@@ -662,7 +662,15 @@ sa.head()
 4	https://www.huffingtonpost.com/entry/jk-rowlin...	j.k. rowling wishes snape happy birthday in th...	0
 '''
 ```
-- **缺失值处理**  
+- **缺失值处理**   
+1. 两种思路：删除含有缺失值的样本；替换/插补  
+2. 处理`NaN`：  
+a. 判断数据中是否存在`NaN`：`pd.isnull(df)`、`pd.notnull(df)`  
+b. 删除含有缺失值的样本：`df.dropna(inplace=False)`；替换/插补：`df.fillna(value, inplace=False)`   
+3. 不是缺失值`NaN`，有默认标记的：  
+a. 替换`?` -> `np.nan`：`df.replace(to_replace="?", value=np.nan)`  
+b. 处理`np.nan`缺失值的步骤  
+4. 缺失值处理实例：
 ```
 import pandas as pd
 import numpy as np
@@ -811,6 +819,44 @@ Rating                True
 Votes                 True
 Revenue (Millions)    True
 Metascore             True
+dtype: bool
+'''
+
+
+# 不是缺失值nan，有默认标记的
+path = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+data = pd.read_csv(path)
+data.head()
+'''
+
+	1000025	5	1	1.1	1.2	2	1.3	3	1.4	1.5	2.1
+0	1002945	5	4	4	5	7	10	3	2	1	2
+1	1015425	3	1	1	1	2	2	3	1	1	2
+2	1016277	6	8	8	1	3	4	3	7	1	2
+3	1017023	4	1	1	3	2	1	3	1	1	2
+4	1017122	8	10	10	8	7	10	9	7	1	4
+'''
+
+# 1. 替换
+data_new = data.replace(to_replace="?", value=np.nan)
+data_new.head()
+
+# 2. 删除缺失值
+data_new.dropna(inplace=True)
+
+data_new.isnull().any()  # 全部返回False说明不存在缺失值了
+'''
+1000025    False
+5          False
+1          False
+1.1        False
+1.2        False
+2          False
+1.3        False
+3          False
+1.4        False
+1.5        False
+2.1        False
 dtype: bool
 '''
 ```
