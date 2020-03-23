@@ -14,3 +14,27 @@
     return new int[]{-1, -1};
   }
 ```
+- **链表的中间结点**  
+1. 解题思路：快慢指针（题目说带有头结点，测试用例却没有带头结点）  
+2. 代码实现：  
+```
+  // Java
+  public ListNode middleNode(ListNode head) {
+    ListNode slow = head;
+    ListNode fast = head;
+    while(fast!=null && fast.next!=null){
+      slow = slow.next;
+      fast = fast.next.next;
+    }
+    return slow;
+  }
+  
+  # Python
+  def middleNode(self, head):
+    slow = head
+    fast = head
+    while fast and fast.next:
+      slow = slow.next
+      fast = fast.next.next
+    return slow
+```
