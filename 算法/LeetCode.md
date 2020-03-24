@@ -38,3 +38,36 @@
       fast = fast.next.next
     return slow
 ```
+- **按摩师**  
+```
+    // Java
+    public int massage(int[] nums) {
+        int len = nums.length;
+        if(len == 0){
+            return 0;
+        }
+        if(len == 1){
+            return nums[0];
+        }
+        int[] dp = new int[len];
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0], nums[1]);
+        for(int i = 2;i < len;i++){
+            dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i]);
+        }
+        return dp[len-1];
+    }
+    
+        # Python翻译
+        def massage(self, nums):
+        if not nums:
+            return 0;
+        if len(nums) == 1:
+            return nums[0]
+        dp = [0 for _ in nums]
+        dp[0] = nums[0]
+        dp[1] = max(nums[0], nums[1])
+        for i in range(2, len(nums)):
+            dp[i] = max(dp[i-1], dp[i-2] + nums[i])
+        return dp[-1]
+```
