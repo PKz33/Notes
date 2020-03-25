@@ -107,7 +107,8 @@ public char FirstAppearingOnce() {
 }
 ```  
 - **数组中出现次数超过一半的数字**   
-解题思路：“攻守阵地”思想
+1. 解题思路：“攻守阵地”思想  
+2. 代码实现：
 ```
 public int MoreThanHalfNum_Solution(int[] nums) {
   int index = nums[0];
@@ -127,4 +128,27 @@ public int MoreThanHalfNum_Solution(int[] nums) {
   }
   return cnt > nums.length/2 ? index : 0;
 }
+```
+- **数组中只出现一次的数字**   
+1. 解题思路：一个数和`0`做异或还是它本身，一个数和它本身做异或结果为`0`  
+2. 代码实现：  
+```
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        int diff = 0;
+        for(int num : array){
+            diff ^= num;
+        }
+        int step = 0;
+        while((diff&1)==0){
+            diff = diff >> 1;
+            step++;
+        }
+        for(int num : array){
+            if(((num >> step)&1) == 0){
+                num1[0] ^= num;
+            }else{
+                num2[0] ^= num;
+            }
+        }
+    }
 ```
