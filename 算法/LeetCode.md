@@ -38,7 +38,9 @@
       fast = fast.next.next
     return slow
 ```
-- **按摩师**  
+- **按摩师**   
+1. 解题思路：`dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i])`  
+2. 代码实现：  
 ```
     // Java
     public int massage(int[] nums) {
@@ -88,5 +90,33 @@
             }
         } 
         return res;      
+    }
+```
+- **买卖股票的最佳时机**  
+1. 解题思路：`dp[i] = Math.max(dp[i - 1], prices[i] - min)` 
+2. 代码实现：  
+```
+    public int maxProfit(int[] prices) {
+        if(prices.length == 0){
+            return 0;
+        }
+        int min = prices[0];
+        int[] dp = new int[prices.length];
+        for(int i = 1;i < prices.length;i++){
+            dp[i] = Math.max(dp[i-1], prices[i] - min);
+            min = Math.min(min, prices[i]);
+        }
+        return dp[prices.length - 1];
+    }
+
+    // 优化
+    public int maxProfit(int[] prices) {
+        int min = Integer.MAX_VALUE;
+        int res = 0;
+        for(int i = 0;i < prices.length;i++) {
+            res = Math.max(res, prices[i] - min);
+            min = Math.min(min, prices[i]);
+        }
+        return res;
     }
 ```
