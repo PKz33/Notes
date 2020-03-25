@@ -71,3 +71,22 @@
             dp[i] = max(dp[i-1], dp[i-2] + nums[i])
         return dp[-1]
 ```
+- **三维形体的表面积**  
+1. 解题思路：每个网格的立方体增加表面积`个数（高度） * 4 + 2`，然后在遍历过程中，分别减去与已经遍历过的相邻网格中立方体的重叠表面积`Math.min(当前高度, 相邻高度) * 2`
+2. 代码实现：  
+```
+    public int surfaceArea(int[][] grid) {
+        int n = grid.length;
+        int res = 0;
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < n;j++){
+                if(grid[i][j] > 0){
+                    res += grid[i][j] * 4 + 2;
+                    res -= i > 0 ? Math.min(grid[i][j], grid[i-1][j]) * 2 : 0;
+                    res -= j > 0 ? Math.min(grid[i][j], grid[i][j-1]) * 2 : 0;
+                }
+            }
+        } 
+        return res;      
+    }
+```
