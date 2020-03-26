@@ -153,3 +153,20 @@
         return res;
     }
 ```
+- **最大子序和**  
+1. 解题思路：如果当前`sum < 0`，则重置`sum`的值，因为`sum`为负数和下一个数相加结果只会比当前值小  
+2. 代码实现：  
+```
+    public int maxSubArray(int[] nums) {
+        int res = nums[0], sum = 0;
+        for(int num : nums){
+            if(sum >= 0){
+                sum += num;
+            }else{
+                sum = num;
+            }
+            res = Math.max(res, sum);
+        }
+        return res;
+    }
+```
