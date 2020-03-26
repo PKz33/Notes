@@ -120,3 +120,36 @@
         return res;
     }
 ```
+- **车的可用捕获量**  
+代码实现：  
+```
+    public int numRookCaptures(char[][] board) {
+        int[][] directs = {{0,-1}, {0,1}, {-1,0}, {1,0}};
+        int res = 0;
+        int x = 0,y = 0;
+        for(int i = 0;i < 8;i++){
+            for(int j = 0;j < 8;j++){
+                if('R' == board[i][j]){
+                    x = i;
+                    y = j;
+                    break;
+                }
+            }
+        }
+        for(int k = 0;k < 4;k++){
+            int i = x, j = y;
+            while(true){
+                i += directs[k][0];
+                j += directs[k][1];
+                if(i <= 0 || i >= 8 || j <= 0 || j >= 8 || 'B' == board[i][j]){
+                    break;
+                }
+                if('p' == board[i][j]){
+                    res++;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+```
