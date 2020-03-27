@@ -170,3 +170,33 @@
         return res;
     }
 ```
+- **卡牌分组**  
+1. 解题思路：统计每种卡牌的次数，判断最大公约数是否大于等于2  
+2. 代码实现：  
+```
+    public boolean hasGroupsSizeX(int[] deck) {
+        if(deck.length < 2) {
+            return false;
+        }
+        int[] count = new int[10000];
+        for(int d : deck) {
+            count[d]++;
+        }
+        int x = -1;
+        for(int c : count) {
+            if(c == 1) {
+                return false;
+            }
+            x = x == -1 ? c : gcd(x, c);
+            // 提前终止循环
+            if(x == 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+```
