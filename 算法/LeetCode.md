@@ -200,3 +200,44 @@
         return b == 0 ? a : gcd(b, a % b);
     }
 ```
+- **单词的压缩编码**  
+1. 解题思路：字典树（后缀所以倒序插入）  
+2. 代码实现：  
+```
+    public int minimumLengthEncoding(String[] words) {
+        TireNode root = new TireNode();
+        HashMap<TireNode, Integer> map = new HashMap<>();
+        for(int i = 0;i < words.length;i++) {
+            String str = words[i];
+            TireNode cur = root;
+            for(int j = str.length() - 1;j >= 0;j--) {
+                cur = cur.insert(str.charAt(j));
+            }
+            map.put(cur, i);
+        }
+        int res = 0;
+        for(TireNode node : map.keySet()) {
+            if(node.count == 0) {
+                res += words[map.get(node)].length() + 1;
+            }
+        }
+        return res;
+    }
+
+
+class TireNode {
+    TireNode[] childs;
+    int count;
+    public TireNode() {
+        childs = new TireNode[26];
+        count = 0;
+    }
+    public TireNode insert(char c) {
+        if(childs[c - 'a'] == null) {
+            childs[c - 'a'] = new TireNode();
+            count++;
+        }
+        return childs[c - 'a'];
+    }
+}
+```
