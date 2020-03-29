@@ -241,3 +241,42 @@ class TireNode {
     }
 }
 ```
+- **地图分析**  
+1. 解题思路：`BFS`填海造陆  
+2. 代码实现：
+```
+    public int maxDistance(int[][] grid) {
+        int[][] dir = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+        Queue<int[]> q = new LinkedList<>();
+        int len = grid.length;
+        for(int i = 0;i < len;i++){
+            for(int j = 0;j < len;j++){
+                if(grid[i][j] == 1){
+                    q.offer(new int[]{i, j});
+                }
+            }
+        }
+        if(q.isEmpty()){
+            return -1;
+        }
+        boolean hasOcean = false;
+        int[] cur = null;
+        while(!q.isEmpty()){
+            cur = q.poll();
+            for(int i = 0;i < 4;i++){
+                int x = cur[0] + dir[i][0];
+                int y = cur[1] + dir[i][1];
+                if(x < 0 || x >= len || y < 0 || y >= len || grid[x][y] != 0){
+                    continue;
+                }
+                hasOcean = true;
+                grid[x][y] = grid[cur[0]][cur[1]] + 1;
+                q.offer(new int[]{x, y});
+            }
+        }
+        if(!hasOcean){
+            return -1;
+        }
+        return grid[cur[0]][cur[1]] - 1; 
+    }
+```
