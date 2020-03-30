@@ -280,3 +280,31 @@ class TireNode {
         return grid[cur[0]][cur[1]] - 1; 
     }
 ```
+- **圆圈中最后剩下的数字**  
+1. 解题思路：模拟/数学法
+2. 代码实现：  
+```
+    // 模拟
+    public int lastRemaining(int n, int m) {
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i = 0;i < n;i++){
+            list.add(i);
+        }
+        int idx = 0;
+        while(n > 1){
+            idx = (idx + m - 1) % n;
+            list.remove(idx);
+            n--; 
+        }
+        return list.get(0);
+    }
+    
+    // 数学法：(当前index + m) % 上一轮剩余数字的个数
+    public int lastRemaining(int n, int m) {
+        int res = 0;
+        for(int i = 2;i <= n;i++){
+            res = (res + m) % i;
+        }
+        return res;
+    }
+```
