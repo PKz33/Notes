@@ -311,12 +311,12 @@ class TireNode {
 - **排序数组**  
 ![](./Pics/排序.png)  
 ```
+    // 快排
     public int[] sortArray(int[] nums) {
         quickSort(nums, 0, nums.length - 1);
         return nums;
     }
 
-    // 快排
     public void quickSort(int[] nums, int l, int h) {
         if(l < h){
             int idx = partition(nums, l, h);
@@ -339,5 +339,40 @@ class TireNode {
         }
         nums[l] = t;
         return l;
+    }
+
+
+    // 归并排序
+    public int[] sortArray(int[] nums) {
+        mergeSort(nums, 0, nums.length - 1);
+        return nums;
+    }
+
+    public void mergeSort(int[] nums, int l, int h) {
+        if(l >= h){
+            return;
+        }
+        int mid = (l + h) >> 1;
+        mergeSort(nums, l, mid);
+        mergeSort(nums, mid + 1, h);
+        int[] arr = new int[h - l + 1];
+        int s = l, m = mid + 1;
+        int k = 0;
+        while(s <= mid && m <= h){
+            if(nums[s] < nums[m]){
+                arr[k++] = nums[s++];
+            }else{
+                arr[k++] = nums[m++];
+            }
+        }
+        while(s <= mid){
+            arr[k++] = nums[s++];
+        }
+        while(m <= h){
+            arr[k++] = nums[m++];
+        }
+        for(int i = 0;i < arr.length;i++){
+            nums[l + i] = arr[i];
+        }
     }
 ```
