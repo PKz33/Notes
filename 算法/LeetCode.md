@@ -375,4 +375,42 @@ class TireNode {
             nums[l + i] = arr[i];
         }
     }
+    
+    
+    // 堆排序
+    public int[] sortArray(int[] nums) {
+        heapSort(nums);
+        return nums;
+    }
+
+    public void heapSort(int[] nums) {
+        int len = nums.length;
+        for(int i = (len >> 1) - 1;i >= 0;i--){
+            adjust(nums, len, i);
+        }
+        for(int i = len - 1;i >= 1;i--){
+            int t = nums[0];
+            nums[0] = nums[i];
+            nums[i] = t;
+            adjust(nums, i, 0);
+        }
+    }
+
+    public void adjust(int[] nums, int len, int idx) {
+        int l = (idx << 1) + 1;
+        int r = (idx << 1) + 2;
+        int max = idx;
+        if(l < len && nums[l] > nums[max]){
+            max = l;
+        }
+        if(r < len && nums[r] > nums[max]){
+            max = r;
+        }
+        if(max != idx){
+            int t = nums[max];
+            nums[max] = nums[idx];
+            nums[idx] = t;
+            adjust(nums, len, max);
+        }
+    }
 ```
