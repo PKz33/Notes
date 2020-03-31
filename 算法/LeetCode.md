@@ -309,4 +309,35 @@ class TireNode {
     }
 ```
 - **排序数组**  
-![](./Pics/排序.png)
+![](./Pics/排序.png)  
+```
+    public int[] sortArray(int[] nums) {
+        quickSort(nums, 0, nums.length - 1);
+        return nums;
+    }
+
+    // 快排
+    public void quickSort(int[] nums, int l, int h) {
+        if(l < h){
+            int idx = partition(nums, l, h);
+            quickSort(nums, l, idx - 1);
+            quickSort(nums, idx + 1, h);
+        }
+    }
+
+    public int partition(int[] nums, int l, int h) {
+        int t = nums[l];
+        while(l < h){
+            while(nums[h] >= t && l < h){
+                h--;
+            }
+            nums[l] = nums[h];
+            while(nums[l] < t && l < h){
+                l++;
+            }
+            nums[h] = nums[l];
+        }
+        nums[l] = t;
+        return l;
+    }
+```
