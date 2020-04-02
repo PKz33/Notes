@@ -182,4 +182,61 @@
 ```  
 4. `set`类型不允许数据重复，如果添加的数据在`set`中已经存在，将只保留一份  
 5. `set`虽然与`hash`的存储结构相同，但是无法启用`hash`中存储值的空间  
-- **sorted_set**  
+- **sorted_set** 
+1. 数据排序有利于数据的有效展示，需要提供一种根据自身特征进行排序的方式  
+2. 在`set`的存储结构基础上添加可排序字段  
+![](./Pics/Redis_sorted_set.png)  
+3. 基本操作  
+```
+  添加数据
+  zadd key score1 member1 [score2 member2]
+  
+  获取全部数据
+  zrange key start stop [WITHSCORES]
+  zrevrange key start stop [WITHSCORES]
+  
+  删除数据
+  zrem key member [member ...]
+  
+  按条件获取数据
+  zrangebyscore key min max [WITHSCORES] [LIMIT]
+  zrevrangebyscore key max min [WITHSCORES]
+  
+  条件删除数据
+  zremrangebyrank key start stop
+  zremrangebyscore key min max
+  
+  min与max用于限定搜索查询的条件
+  start与stop用于限定查询范围，作用于索引，表示开始和结束索引
+  offset与count用于限定查询范围，作用于查询结果，表示开始位置和数据总量
+  
+  获取集合数据总量
+  zcard key
+  zcount key min max
+  
+  集合交、并操作
+  numkeys表示key的数量
+  zinterstore destination numkeys key [key ...]
+  zunionstore destination numkeys key [key ...]
+  
+  获取数据对应的索引（排名）
+  zrank key member
+  zrevrank key member
+  
+  score值获取与修改
+  zscore key member
+  zincrby key increment member  
+  
+  获取当前系统时间
+  time
+```
+4. `sorted_set`底层存储还是基于`set`结构，数据不能重复，如果重复添加相同的数据，`score`值将被反复覆盖，保留最后一次修改的结果
+- **限制单用户单位时间内访问次数**  
+1. 解决方案：  
+a. 设计计数器，记录调用次数，用于控制业务执行次数。以用户`id`作为`key`，访问次数作为`value`  
+b. 在访问之前获取次数，判断是否超过限定次数：不超过，则每次访问`计数 + 1`；访问失败，`计数 - 1`  
+c. 为计数器设置生命周期为指定单位时间，自动清空周期内访问次数  
+2. 解决方案改良：  
+a. 取消最大值的判定，利用`incr`操作超过最大值抛出异常的形式，替代每次判断是否大于最大值  
+b. 访问之前判断是否为`nil`：如果是，设置计数值为`Max - 限制访问次数`；如果不是，`计数 + 1`；访问失败，`计数 - 1`  
+c. 遇到异常，则视为访问次数达到上限
