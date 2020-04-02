@@ -452,3 +452,41 @@ class TireNode {
         return stack.isEmpty();     
     }
 ```
+- **生命游戏**  
+1. 解题思路：注意状态是同时变化的  
+2. 代码实现：  
+```
+    public void gameOfLife(int[][] board) {
+        int[] direct = {-1, 0, 1};
+        int m = board.length;
+        int n = board[0].length;
+        int liveNeighbors;
+        for(int i = 0;i < m;i++){
+            for(int j = 0;j < n;j++){
+                liveNeighbors = 0;
+                for(int k = 0;k < 3;k++){
+                    for(int l = 0;l < 3;l++){
+                        if(!(direct[k] == 0 && direct[l] == 0)){
+                            int r = i + direct[k];
+                            int c = j + direct[l];
+                            if(r >= 0 && r < m && c >= 0 && c < n && (Math.abs(board[r][c]) == 1)){
+                                liveNeighbors++;
+                            }
+                        }
+                    }
+                }
+                if(board[i][j] == 1 && (liveNeighbors < 2 || liveNeighbors > 3)){
+                    board[i][j] = -1;
+                }
+                if(board[i][j] == 0 && liveNeighbors == 3){
+                    board[i][j] = 2;
+                }
+            }
+        }
+        for(int i = 0;i < m;i++){
+            for(int j = 0;j < n;j++){
+                board[i][j] = board[i][j] <= 0 ? 0 : 1;
+            }
+        }
+    }
+```
