@@ -490,3 +490,34 @@ class TireNode {
         }
     }
 ```
+- **字符串转换整数（atoi）**  
+1. 解题思路：按题意模拟（更简捷的方法用正则表达式）
+2. 代码实现：  
+```
+    public int myAtoi(String str) {
+        int res = 0;
+        boolean isNegative = false;
+        int idx = 0;
+        while(idx < str.length() && ' ' == str.charAt(idx)){
+            idx++;
+        }
+        if(idx == str.length()){
+            return 0;
+        }
+        if('-' == str.charAt(idx)){
+            isNegative = true;
+        }
+        if('+' == str.charAt(idx) || '-' == str.charAt(idx)){
+            idx++;
+        }
+        while(idx < str.length() && str.charAt(idx) >= '0' && str.charAt(idx) <= '9'){
+            int cur = str.charAt(idx) - '0';
+            if(res > Integer.MAX_VALUE / 10 || (res == Integer.MAX_VALUE / 10 && cur >= 8)){
+                return isNegative ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+            }
+            res = res * 10 + cur;
+            idx++;
+        }
+        return isNegative ? -res : res;
+    }
+```
