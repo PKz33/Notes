@@ -521,3 +521,34 @@ class TireNode {
         return isNegative ? -res : res;
     }
 ```
+- **多数元素**  
+1. 解题思路：投票算法（攻守阵地算法），注意题目中假定总是存在多数元素  
+2. 代码实现：  
+```
+    public int majorityElement(int[] nums) {
+        int res = nums[0];
+        int count = 1;
+        for(int i = 1;i < nums.length;i++){
+            count = nums[i] == res ? count + 1 : count - 1;
+            if(count == 0){
+                res = nums[i];
+                count = 1;
+            }
+        }
+        return res;
+    }
+    
+    // 改写版
+    // 代码简捷了一些，但是LC判题后耗时不增反降，是因为自动装箱/拆箱？
+    public int majorityElement(int[] nums) {
+        int count = 0;
+        Integer res = null;
+        for(int num : nums){
+            if(count == 0){
+                res = num;
+            }
+            count += (num == res) ? 1 : -1;
+        }
+        return res;
+    }
+```
