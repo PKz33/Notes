@@ -539,7 +539,7 @@ class TireNode {
     }
     
     // 改写版
-    // 代码简捷了一些，但是LC判题后耗时不增反降，是因为自动装箱/拆箱？
+    // 代码简捷了一些，但是LC判题后耗时不增反降，是因为创建包装类对象/自动装箱/拆箱？
     public int majorityElement(int[] nums) {
         int count = 0;
         Integer res = null;
