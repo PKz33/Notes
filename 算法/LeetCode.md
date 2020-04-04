@@ -633,3 +633,19 @@ class MyStack {
         return res;
     }
 ```
+- **最长回文串**  
+1. 解题思路：注意题意是说由给定字符构成的回文串，并不是在给定串中查找  
+2. 代码实现：  
+```
+    public int longestPalindrome(String s) {
+        int[] arr = new int[128];
+        for(char c : s.toCharArray()){
+            arr[c]++;
+        }
+        int count = 0;
+        for(int n : arr){
+            count += n % 2;
+        }
+        return count == 0 ? s.length() : (s.length() - count + 1);
+    }
+```
