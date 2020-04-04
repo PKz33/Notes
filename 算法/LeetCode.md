@@ -649,3 +649,25 @@ class MyStack {
         return count == 0 ? s.length() : (s.length() - count + 1);
     }
 ```
+- **二叉树的直径**  
+```
+class Solution {
+    int ans;
+    public int diameterOfBinaryTree(TreeNode root) {
+        // 注意这里
+        ans = 1;
+        depth(root);
+        return ans - 1;
+    }
+
+    public int depth(TreeNode root){
+        if(root == null){
+            return 0;
+        }
+        int l = depth(root.left);
+        int r = depth(root.right);
+        ans = Math.max(ans, l + r + 1);
+        return Math.max(l, r) + 1;
+    }
+}
+```
