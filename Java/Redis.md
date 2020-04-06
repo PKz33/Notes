@@ -240,3 +240,101 @@ c. 为计数器设置生命周期为指定单位时间，自动清空周期内�
 a. 取消最大值的判定，利用`incr`操作超过最大值抛出异常的形式，替代每次判断是否大于最大值  
 b. 访问之前判断是否为`nil`：如果是，设置计数值为`Max - 限制访问次数`；如果不是，`计数 + 1`；访问失败，`计数 - 1`  
 c. 遇到异常，则视为访问次数达到上限
+- **Redis案例**  
+1. 分布式锁  
+```
+  SETNX product:101 true  // 返回1代表获取锁成功  
+  SETNX product:101 false // 返回0代表获取锁失败
+  // 执行业务操作
+  DEL product:101 // 执行完业务释放锁
+  
+  SET product:101 true EX 10 NX // 防止程序意外终止导致死锁
+  // EX seconds：将key的过期时间设置为seconds秒，等同于SETEX key seconds value
+  // NX：只有key不存在时，才对key进行设置操作，等同于SETNX key value
+```  
+2. 计数器  
+```
+  INCR article:readcount:{文章id}
+  GET article:readcount:{文章id}
+```  
+3. `Web`集群`session`共享
+4. 分布式系统全局序列号：`INCRBY orderId 1000  // redis批量生成序列号提升性能`  
+5. 电商购物车  
+```
+  1) 以用户id为key
+  2) 商品id为field
+  3) 商品数量为value
+  
+  购物车操作
+  1) 添加商品：HSET cart:101 1001 1
+  2) 增加数量：HINCRBY cart:101 1001 1
+  3) 商品总数：HLEN cart:101
+  4) 删除商品：HDEL cart:101 1001
+  5) 获取购物车所有商品：HGETALL cart:101
+```  
+6. 模拟常用数据结构  
+```
+  Stack（栈） = LPUSH + LPOP
+  Queue（队列） = LPUSH + RPOP
+  Blocking MQ（阻塞队列） = LPUSH + BRPOP
+```
+7. 微博消息和微信公众号消息  
+```
+  A关注了B，C等大V
+  1) B发微博，消息ID为101
+  LPUSH msg:{A-ID} 101
+  2) C发微博，消息ID为104
+  LPUSH msg:{A-ID} 104
+  3) 查看最新微博消息
+  LRANGE msg:{A-ID} 0 5
+```
+8. 微信抽奖小程序
+```
+  1) 点击参与抽奖加入集合
+  SADD key {userID}
+  2) 查看参与抽奖的所有用户
+  SMEMBERS key
+  3) 抽取count名中奖者
+  SRANDMEMBER key [count] // 抽取后保留
+  SPOP key [count]  // 抽取后不保留  
+```
+9. 微信微博点赞，收藏，标签
+```
+  1) 点赞
+  SADD like:{消息ID} {用户ID}
+  2) 取消点赞
+  SREM like:{消息ID} {用户ID}
+  3) 检查用户是否点过赞
+  SISMEMBER like:{消息ID} {用户ID}
+  4) 获取点赞的用户列表
+  SMEMBERS like:{消息ID}
+  5) 获取点赞用户数
+  SCARD like:{消息ID}
+```  
+10. 集合操作实现微博微信关注模型
+```
+  1) A关注的人：
+  aSet  {B, C, D}
+  2) B关注的人：
+  bSet  {A, C, D, E}
+  3) C关注的人：
+  cSet  {A, B, E, D, F}
+  4) A和B共同关注的人：
+  SINTER aSet bSet  // {C, D}
+  5) 我（A）关注的人也关注他（B）：
+  SISMEMBER cSet B
+  SISMEMBER dSet B
+  6) 我（A）可能认识的人：
+  SDIFF bSet aSet // {A, E}
+```
+11. `Zset`集合操作实现排行榜
+```
+  1) 点击新闻
+  ZINCRBY hotNews:20200406 1 新闻1
+  2) 展示当日排行前十
+  ZREVRANGE hotNews:20200406 0 9 WITHSCORES
+  3) 七日搜索榜单计算
+  ZUNIONSORE hns:0331-0406 7 hns:0331 hns:0401 hns:0402 hns:0403 hns:0404 hns:0405 hns:0406
+  4) 展示七日排行前十
+  ZREVRANGE hns:0331-0406 0 9 WITHSCORES
+```
