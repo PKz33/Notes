@@ -701,3 +701,21 @@ class Solution {
         return dp[amount] > amount ? -1 : dp[amount];
     }
 ```
+- **旋转矩阵**  
+1. 解题思路：每一组交换的四个数的坐标`(i, j)`，`(j, n-i-1)`，`(n-i-1, n-j-1)`，`(n-j-1, i)`，然后根据方向（顺时针/逆时针）交换
+2. 代码实现：  
+```
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        int t = matrix[0][0];
+        for(int i = 0;i < n / 2;i++){
+            for(int j = 0;j < (n + 1) / 2;j++){
+                t = matrix[i][j];
+                matrix[i][j] = matrix[n-j-1][i];
+                matrix[n-j-1][i] = matrix[n-i-1][n-j-1];
+                matrix[n-i-1][n-j-1] = matrix[j][n-i-1];
+                matrix[j][n-i-1] = t;
+            }
+        }
+    }
+```
