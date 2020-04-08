@@ -363,4 +363,184 @@ c. 遇到异常，则视为访问次数达到上限
   
   切换key从时效性转换为永久性
   PERSIST key
+  
+  为key改名
+  RENAME key newkey
+  RENAMENX key newkey
+  
+  对所有key排序
+  SORT
+  
+  其他key通用操作
+  HELP @GENERIC
+```
+3. 查询模式
+```
+  查询key
+  KEYS pattern
+  
+  查询模式规则
+  * 匹配任意数量的任意符号
+  ? 匹配一个任意符号
+  [] 匹配一个指定符号
+  
+  查询所有
+  KEYS * 
+  
+  查询以pkz开头
+  KEYS pkz*
+  
+  查询以pkz结尾
+  KEYS *pkz
+  
+  查询所有前面两个字符任意，后面以pkz结尾
+  KEYS ??pkz
+  
+  查询所有以user:开头，最后一个字符任意
+  KEYS user:?
+  
+  查询所有以u开头，以er:1结尾，中间包含一个字母，s或t
+  KEYS u[st]er:1  
+```
+4. `redis`为每个服务提供16个数据库，编号从0到15，每个数据库之间的数据相互独立
+```
+  切换数据库
+  SELECT index
+  
+  其他操作
+  QUIT
+  PING
+  ECHO message
+  
+  数据移动
+  MOVE key db
+  
+  数据清除
+  DBSIZE
+  FLUSHDB
+  FLUSHALL
+```
+- **Jedis**  
+![](./Pics/Jedis.png)
+1. 客户端连接`redis`  
+```
+  <!-- 导入依赖 -->
+  <dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <version>2.9.0</version>
+  </dependency>
+  
+  // 连接 redis
+  Jedis jedis = new Jedis("localhost", 6379);
+  
+  // 操作redis
+  jedis.set("name", "pkz");
+  jedis.get("name");
+  
+  // 关闭redis连接
+  jedis.close();
+```
+2. 服务调用次数控制案例  
+```
+  案例需求：
+  1) 设定A、B、C三个用户
+  2) A用户限制10次/分调用，B用户限制30次/分调用，C用户不限制
+  
+  // 设定业务方法
+  public void business(String id, Long val){
+    System.out.println("用户：" + id + " 业务操作执行第" + val + "次");
+  }
+  
+  // 设定多线程类，模拟用户调用
+  class MyThread extends Thread {
+    Service sc;
+    
+    public MyThread(String id, int num){
+      sc = new Service(id, num);
+    }
+    
+    public void run(){
+      while(true){
+        sc.service();
+        try{
+          Thread.sleep(300L);
+        }catch(InterruptedException e){
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+  
+  // 设计redis控制方案
+  public void service(){
+    Jedis jedis = new Jedis("127.0.0.1", 6379);
+    String value = jedis.get("compid:" + id);
+    // 判断该值是否存在
+    try{
+      if(value == null){
+        // 不存在，创建该值
+        jedis.setex("compid:" + id, 5, Long.MAX_VALUE - num + "");
+      }else{
+        // 存在，自增，调用业务
+        Long val = jedis.incr("compid:" + id);
+        business(id, num - (Long.MAX_VALUE - val));
+      }
+    }catch(JedisDataException e){
+      System.out.println("访问达到次数上限，请升级会员级别");
+      return;
+    }finally{
+      jedis.close();
+    }
+  }
+  
+  // 设计启动主程序
+  public static void main(String[] args){
+    MyThread mt1 = new MyThread("初级用户", 10);
+    MyThread mt2 = new MyThread("高级用户", 30);
+    mt1.start();
+    mt2.start();
+  }
+  
+  // 对业务控制方案进行改造，设定不同用户等级的判定
+  // 将不同用户等级对应的信息、限制次数等设定到redis中，使用hash保存
+```
+3. 基于连接池获取连接
+```
+  JedisPool：Jedis提供的连接池技术
+    poolConfig：连接池配置对象
+    host：redis服务地址
+    port：redis服务端口号
+  public JedisPool(GenericObjectPoolConfig poolConfig, String host, int port){
+    this(poolConfig, host, port, 2000, (String)null, 0, (String)null);
+  }
+  
+  // 封装连接参数
+  // jedis.properties
+  jedis.host = localhost
+  jedis.port = 6379
+  jedis.maxTotal = 30
+  jedis.maxIdle = 10
+  
+  // 加载配置信息
+  // 静态代码块初始化资源
+  static{
+    // 读取配置文件，获取参数值
+    ResourceBundle rb = ResourceBundle.getBundle("jedis");
+    host = rb.getString("jedis.host");
+    port = Integer.parseInt(rb.getString("jedis.port"));
+    maxTotal = Integer.parseInt(rb.getString("jedis.maxTotal"));
+    maxIdle = Integer.parseInt(rb.getString("jedis.maxIdle"));
+    poolConfig = new JedisPoolConfig();
+    poolConfig.setMaxTotal(maxTotal);
+    poolConfig.setMaxIdle(maxIdle);
+    jedisPool = new JedisPool(poolConfig, host, port);
+  }
+  
+  // 获取连接
+  // 对外访问接口，提供jedis连接对象，连接从连接池获取
+  public static Jedis getJedis(){
+    Jedis jedis = jedisPool.getResource();
+    return jedis;
+  }
 ```
