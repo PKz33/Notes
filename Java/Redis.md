@@ -544,3 +544,57 @@ c. 遇到异常，则视为访问次数达到上限
     return jedis;
   }
 ```
+- **Linux环境下安装redis**  
+- **配置启动redis**  
+```
+  cat redis.conf | grep -v "#" | grep -v "^$" > redis-6379.conf
+  
+  cat redis-6379.conf
+  # port 6379
+  # daemonize yes
+  # logfile "6379.log"
+  # dir /root/redis-5.0.5/data
+  
+  redis-server redis-6379.conf
+  
+  ps -ef | grep redis-
+  
+  kill -s 9 进程号
+  
+  mkdir conf
+  
+  mv redis-6379.conf conf
+  
+  cp redis-6379.conf redis-6380.conf
+  
+  cat redis-6380.conf
+  # 设定当前服务启动的端口号
+  # port 6380
+  # 以守护进程方式启动，redis将以服务的形式存在，日志将不再打印到命令窗口中
+  # daemonize yes
+  # 设定日志文件名，方便查阅
+  # logfile "6380.log"
+  # 设定当前服务文件保存位置，包含日志文件、持久化文件等
+  # dir /root/redis-5.0.5/data
+  
+  默认配置启动
+  redis-server
+  redis-server --port 6379
+  redis-server --port 6380
+  
+  指定配置文件启动
+  redis-server redis.conf
+  redis-server redis-6379.conf
+  redis-server redis-6380.conf
+  redis-server conf/redis-6379.conf
+  redis-server config/redis-6380.conf
+  
+  Redis客户端连接
+  默认连接
+  redis-cli
+  
+  连接指定服务器
+  redis-cli -h 127.0.0.1
+  redis-cli -p 6379
+  redis-cli -h 127.0.0.1 -p 6379
+```
