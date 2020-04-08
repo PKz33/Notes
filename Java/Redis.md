@@ -338,3 +338,29 @@ c. 遇到异常，则视为访问次数达到上限
   4) 展示七日排行前十
   ZREVRANGE hns:0331-0406 0 9 WITHSCORES
 ```
+- **key**  
+1. `key`是一个字符串，通过`key`获取`redis`中保存的数据  
+2. 基本操作  
+```
+  删除指定key
+  DEL key
+  
+  获取key是否存在
+  EXISTS key
+  
+  获取key的类型
+  TYPE key
+  
+  为指定key设置有效期
+  EXPIRE key seconds
+  EXPIRE key milliseconds
+  EXPIREAT key timestamp
+  EXPIREAT key milliseconds-timestamp
+  
+  获取key的有效时间
+  TTL key
+  PTTL key
+  
+  切换key从时效性转换为永久性
+  PERSIST key
+```
