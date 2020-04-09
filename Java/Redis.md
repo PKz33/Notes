@@ -598,3 +598,160 @@ c. 遇到异常，则视为访问次数达到上限
   redis-cli -p 6379
   redis-cli -h 127.0.0.1 -p 6379
 ```
+- **持久化**  
+1. 利用永久性存储介质将数据保存，在特定时间将保存的数据进行恢复  
+2. 持久化用于防止数据的意外丢失，确保数据安全性  
+3. 数据状态持久化：快照形式，存储数据，存储格式简单，关注点在数据；操作过程持久化：日志形式，存储操作过程，存储格式复杂，关注点在数据的操作过程  
+![](./Pics/持久化.png)  
+- **RDB**  
+1. `save`指令  
+```
+  语法：save
+  
+  作用：手动执行一次保存操作
+  
+  save指令相关配置： 
+  dbfilename dump.rdb
+    设置本地数据库文件名，默认值为dump.rdb
+    通常设置为dump-端口号.rdb
+  dir
+    设置存储.rdb文件的路径
+  rdbcompression yes
+    设置存储至本地数据库时是否压缩数据，默认为yes
+    通常默认为开启状态，如果设置为no，可以节省CPU运行时间，但会使存储的文件变大
+  rdbchecksum yes
+    设置是否进行RDB文件格式校验，该校验过程在写文件和读文件过程中均进行
+    通常默认为开启状态，如果设置为no，可以节约读写性过程约10%时间消耗，但是有一定的数据损坏的风险
+    
+  cat redis-6379.conf
+  # port 6379
+  # daemonize yes
+  # logfile "6379.log"
+  # dir /root/redis-5.0.5/data
+  # dbfilename dump-6379.rdb
+  # rdbcompression yes
+  # rdbchecksum yes
+```  
+2. 数据量过大，单线程执行方式造成效率过低：`save`指令的执行会阻塞当前`Redis`服务器，直到当前`RDB`过程完成为止，有可能造成长时间阻塞，线上环境不建议使用  
+3. `bgsave`指令  
+![](./Pics/Bgsave.png)  
+```
+  语法：bgsave
+  
+  作用：手动启动后台保存操作，但不是立即执行
+  
+  bgsave指令相关配置：
+  dbfilename dump.rdb
+  dir
+  rdbcompression yes
+  rdbchecksum yes
+  stop-writes-on-bgsave-error yes
+    后台存储过程中如果出现错误，是否停止保存操作
+    通常默认为开启状态
+```
+4. `bgsave`命令是针对`save`阻塞问题做的优化，`Redis`内部涉及到`RDB`操作都采用`bgsave`方式  
+5. `save`配置
+![](./Pics/Save配置原理.png)
+```
+  配置：save seconds changes
+  
+  作用：满足限定时间范围内key的变化数量达到指定数量则进行持久化
+  
+  参数：
+    seconds：监控时间范围
+    changes：监控key的变化量
+    
+  cat redis-6379.conf
+  # port 6379
+  # daemonize yes
+  # logfile "6379.log"
+  # dir /root/redis-5.0.5/data
+  # dbfilename dump-6379.rdb
+  # rdbcompression yes
+  # rdbchecksum yes
+  # save 10 2
+```  
+6. `save`配置启动后执行的是`bgsave`操作；`save`配置要根据实际业务情况进行设置，频度过高或过低都会出现性能问题  
+7. `RDB`启动方式对比  
+![](./Pics/RDB启动方式对比.png)  
+8. `RDB`特殊启动方式  
+```
+  全量复制
+  
+  服务器运行过程中重启
+  debug reload
+  
+  关闭服务器时指定保存数据
+  shutdown save
+```  
+9. `RDB`优点：   
+a. `RDB`采用紧凑压缩的二进制文件，存储效率较高  
+b. `RDB`内部存储`redis`在某个时间点的数据快照，适合于数据备份，全量复制等场景  
+c. `RDB`恢复数据的速度比`AOF`快很多  
+d. 应用：服务器定期执行`bgsave`备份，并将`RDB`文件拷贝到远程机器中，用于灾难恢复  
+10. `RDB`缺点：  
+a. `RDB`方式无论是执行指令还是利用配置，都无法做到实时持久化，具有较大的可能性丢失数据  
+b. `bgsave`指令每次运行需要执行`fork`操作创建子进程，性能会有所降低  
+c. `Redis`众多版本中未进行`RDB`文件格式的版本统一，可能出现各版本服务器之间的数据格式无法兼容的现象  
+- **AOF**
+1. `AOF`持久化：以独立日志的方式记录每次写命令，重启时重新执行`AOF`文件中命令以达到恢复数据的目的，与`RDB`相比可以简单描述为[由记录数据转变为记录数据产生的过程]  
+2. `AOF`的主要解决数据持久化的实时性问题，目前已经称为`Redis`持久化的主流方式  
+![](./Pics/AOF写数据过程.png)  
+3. `AOF`写数据的三种策略（`appendfsync`）  
+```
+  always（每次）
+    每次写入操作均同步到AOF文件中，数据零误差，性能较低，不建议使用
+  everysec（每秒）
+    每秒将缓冲区中的指令同步到AOF文件中，数据准确性较高，性能较高，建议使用，也是默认配置
+    在系统突然宕机的情况下会丢失1秒内的数据
+  no（系统控制）
+    由操作系统控制每次同步到AOF文件的周期，整体过程不可控
+```  
+4. `AOF`相关配置  
+```
+  配置：appendonly yes|no
+  作用：是否开启AOF持久化功能，默认为不开启状态
+  
+  配置：appendfsync always|everysec|no
+  作用：AOF写数据策略
+  
+  配置：appendfilename filename
+  作用：AOF持久化文件名，默认文件名为appendonly.aof，建议配置为appendonly-端口号.aof
+  
+  配置：dir
+  作用：AOF持久化文件保存路径，与RDB持久化文件保持一致即可
+```  
+5. `AOF`重写  
+![](./Pics/AOF写数据瓶颈.png)  
+a. `Redis`引入`AOF`重写机制压缩文件体积，`AOF`文件重写是将`Redis`进程内的数据转化为写命令同步到新的`AOF`文件的过程，简单说，是对同一个数据的若干条命令执行结果，转化为最终结果数据所对应的指令，进行记录  
+b. 作用：降低磁盘占用量，提高磁盘利用率；提高持久化效率，提高数恢复效率  
+c. 重写方式  
+```
+  手动重写
+  bgrewriteaof
+  
+  自动重写
+  auto-aof-rewrite-min-size size
+  auto-aof-rewrite-percentage percentage
+  
+  自动重写触发比对参数（运行指令info persistence获取具体信息）
+  aof_current_size
+  aof_base_size
+  
+  自动重写触发条件
+  aof_current_size > auto-aof-rewrite-min-size
+  (aof_current_size - aof_base_size) / aof_base_size >= auto-aof-rewrite-percentage
+```  
+![](./Pics/AOF手动重写_bgrewriteaof原理.png)  
+d. 重写流程  
+![](./Pics/AOF重写流程1.png)  
+![](./Pics/AOF重写流程2.png)  
+- **RDB和AOF对比**  
+![](./Pics/RDB和AOF对比.png)  
+```
+  对数据非常敏感，建议使用默认的AOF持久化方案；数据呈现阶段有效性，建议使用RDB持久化方案
+    若不能承受数分钟以内的数据丢失，选用AOF
+    若能承受分钟以内的数据丢失，且追求大数据集的恢复速度，选用RDB
+    灾难恢复选用RDB
+    双保险策略，同时开启RDB和AOF，重启后，Redis优先使用AOF恢复数据，减少数据的丢失
+```
