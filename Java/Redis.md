@@ -844,9 +844,9 @@ a. 数据达到过期时间，不做处理。访问数据时先检测（`expireI
 b. 优点：节约CPU性能，发现必须删除的时候才进行删除  
 c. 缺点：内存压力大，会出现长期占用内存的数据  
 d. 用存储空间换取处理器性能（时间换空间）  
-3. 定期删除  
+3. 定期删除    
 ![](./Pics/Redis存储空间1.png)  
-![](./Pics/Redis存储空间2.png)
+![](./Pics/Redis存储空间2.png)  
 a. `Redis`启动服务器初始化时，读取配置`server.hz`的值，默认为10  
 b. 每秒钟执行`server.hz`次`serverCron()`，`serverCron()`调用`databasesCron()`，`databasesCron()`调用`activeExpireCycle()`  
 c. `activeExpireCycle()`对每个`expires[*]`逐一进行检测，每次执行`250ms / server.hz`时长  
