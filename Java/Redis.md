@@ -792,7 +792,7 @@ d. 重写流程
 4. 锁  
 ```
   对key添加监视锁，在执行exec前如果key发生了变化，终止事务执行
-  watch key1 [key2] ...
+  watch key1 [key2 ...]
   
   取消对所有key的监视
   unwatch
