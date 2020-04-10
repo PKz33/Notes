@@ -928,3 +928,74 @@ c. 定期删除：内存定期随机清理；每秒花费固定的CPU资源维�
   导入并加载指定配置文件信息
   include /path/server-端口号.conf
 ```
+- **高级数据类型**  
+1. `Bitmaps`    
+```
+  获取指定key对应偏移量上的bit值
+  getbit key offset
+  
+  设置指定key对应偏移量上的bit值，value只能是1或0
+  setbit key offset value
+  
+  对指定key按位进行交、并、非、异或操作，并将结果保存到destKey中
+  bitop op destKey key1 [key2 ...]
+    and：交
+    or：并
+    not：非
+    xor：异或
+  
+  统计指定key中1的数量
+  bitcount key [start end]
+```  
+![](./Pics/Bitmaps案例.png)
+2. `HyperLogLog`    
+```
+  原始方案：set
+    存储每个用户的id（字符串）
+  改进方案：Bitmaps
+    存储每个用户状态（bit）
+  全新方案：HyperLogLog
+  
+  基数是数据集去重后元素的个数
+  HyperLogLog是用来做基数统计的
+  {1, 3, 5, 7, 5, 7, 8} 基数集：{1, 3, 5, 7, 8} 基数：5
+  {1, 1, 1, 1, 1, 7, 1} 基数集：{1, 7}  基数：2
+  
+  HyperLogLog类型的基本操作：
+  
+  添加数据
+  pfadd key element [element ...]
+  
+  统计数据
+  pfcount key [key ...]
+  
+  合并数据
+  pfmerge destkey sourcekey [sourcekey ...]
+  
+  相关说明：
+  用于进行基数统计，只记录数量而不是具体数据
+  核心是基数估算算法，最终数值存在一定误差，误差范围：基数估计的结果是一个带有0.81%标准错误的近似值
+  消耗空间极小，每个hyperloglog key至多占用12K的内存用于标记基数
+  pfadd命令不是一次性分配12K内存使用，内存会随着基数的增加逐渐增大
+  pfmerge命令合并后占用的存储空间为12K，无论合并之前数据量是多少
+```  
+3. `GEO`    
+```
+  添加坐标点
+  geoadd key longitude latitude member [longitude latitude member ...]
+  
+  获取坐标点
+  geopos key member [member ...]
+  
+  计算坐标点距离
+  geodist key member1 member2 [unit]
+  
+  根据坐标求范围内的数据
+  georadius key longitude latitude radius m|km|ft|mi [withcoord] [withdist] [withhash] [count count]
+  
+  根据点求范围内的数据
+  georadiusbymember key member radius m|km|ft|mi [withcoord] [withdist] [withhash] [count count]
+  
+  获取指定点对应的坐标的hash值
+  geohash key member [member ...]
+```
