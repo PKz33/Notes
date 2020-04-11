@@ -999,3 +999,180 @@ c. 定期删除：内存定期随机清理；每秒花费固定的CPU资源维�
   获取指定点对应的坐标的hash值
   geohash key member [member ...]
 ```
+- **主从复制**  
+![](./Pics/多台服务器连接方案.png)   
+![](./Pics/高可用集群.png)  
+1. 为了避免单点`Redis`服务器故障，准备多台服务器互相连通，将数据复制多个副本保存在不同的服务器上，连接在一起，并且保证数据是同步的。即使其中一台服务器宕机，其他服务器依然可以继续提供服务，实现`Redis`的高可用，同时实现数据冗余备份  
+2. 多台服务器连接  
+```
+  提供数据方：master
+    主服务器，主节点，主库
+    主客户端
+  
+  接收数据方：slave
+    从服务器，从节点，从库
+    从客户端
+  
+  需要解决的问题：数据同步
+  
+  核心工作：master的数据复制到slave中
+```  
+3.   
+```
+  主从复制是将master中的数据即时、有效的复制到slave中
+  
+  特征：一个master可以对应多个slave，一个slave只对应一个master
+  
+  master：
+    写数据
+    执行写操作时，将出现变化的数据自动同步到slave
+    读数据（可忽略）
+    
+  slave：
+    读数据
+    写数据（禁止）
+```
+4. 主从复制的作用：  
+a. 读写分离：`master`写、`slave`读，提高服务器的读写负载能力  
+b. 负载均衡：基于主从结构，配合读写分离，由`slave`分担`master`的负载，并根据需求的变化，改变`slave`的数量，通过多个从节点分担数据读取负载，大大提高`Redis`服务器并发量与数据吞吐量  
+c. 故障恢复：当`master`出现问题时，由`slave`提供服务，实现快速的故障恢复  
+d. 数据冗余：实现数据热备份，是持久化之外的一种数据冗余方式  
+e. 高可用基石：基于主从复制，构建哨兵模式与集群，实现`Redis`的高可用方案  
+- **主从复制的过程**  
+![](./Pics/主从复制1.png)  
+1. 建立连接阶段  
+```
+  建立slave到master的连接，使master能够识别slave，并保存slave端口号
+  
+  步骤1：设置master的地址和端口号，保存master信息
+  步骤2：建立socket连接
+  步骤3：发送ping命令（定时器任务）
+  步骤4：身份验证
+  步骤5：发送slave端口信息
+  主从连接建立成功
+  
+  状态：
+    slave：保存master的地址和端口
+    master：保存slave的端口
+    总体：相互之间创建了socket连接
+    
+  slave连接master：
+  方式一：客户端发送命令
+  slaveof <masterip> <masterport>
+  方式二：启动服务器参数
+  redis-server --slaveof <masterip> <masterport>
+  方式三：服务器配置（修改配置文件）
+  slaveof <masterip> <masterport>
+  
+  slave系统信息：
+    master_link_down_since_seconds
+    masterhost
+    masterport
+  master系统信息：
+    slave_listening_port（多个）
+    
+  # redis-server redis-6379.conf
+  # redis-server redis-6380.conf
+  
+  # redis-cli
+  # set name pkz
+  
+  # redis-cli -p 6380
+  # slaveof 127.0.0.1 6379
+  # get name
+    
+  # redis-server redis-6380.conf --slaveof 127.0.0.1 6379
+  
+  主从断开连接
+    客户端发送命令：slaveof no one
+    
+  授权访问
+    master配置文件设置密码
+      requirepass <password>
+    master客户端发送命令设置密码
+      config set requirepass <password>
+      config get requirepass
+    slave客户端发送命令设置密码
+      auth <password>
+    slave配置文件设置密码
+      masterauth <password>
+    启动客户端设置密码
+      redis-cli -a <password>  
+```  
+![](./Pics/主从复制_建立连接.png)   
+2. 数据同步阶段  
+```
+  在slave初次连接master后，复制master中的所有数据到slave
+  将slave的数据库状态更新为master当前的数据库状态
+  
+  步骤1：请求同步数据
+  步骤2：创建RDB同步数据
+  步骤3：恢复RDB同步数据
+  步骤4：请求部分同步数据
+  步骤5：恢复部分同步数据
+  数据同步工作完成
+  
+  状态：
+    slave：具有master端全部数据，包含RDB过程接收的数据
+    master：保存slave当前数据同步的位置
+    总体：完成了数据克隆
+    
+  数据同步阶段master相关说明：
+    1) 如果master数据量巨大，数据同步应避开流量高峰期，避免造成master阻塞，影响业务正常执行
+    2) 复制缓冲区的大小设定不合理，会导致数据溢出。例如进行全量复制周期太长，进行部分复制时发现存在数据丢失的情况，必须进行第二次全量复制，   致使slave陷入死循环状态。配置复制缓冲区大小：repl-backlog-size 1mb
+    3) master单机内存占用主机内存的比例不应过大，建议使用50%-70%的内存，剩余30%-50%的内存用于执行bgsave命令和创建复制缓冲区
+    
+  数据同步阶段slave相关说明：
+    1) 为避免slave进行全量复制、部分复制时服务器响应阻塞或数据不同步，建议关闭此期间的对外服务：slave-serve-stale-data yes|no
+    2) 多个slave同时对master请求同步数据，master发送的RDB文件增多，会对带宽造成巨大冲击，可能导致master带宽不足，因此数据同步需要根据业务   需求，适当错峰
+    3) slave过多时，建议调整拓扑结构，由一主多从结构变成树状结构，中间节点既是master，也是slave。使用树状结构时，层次深度越高的slave与最顶   层master进行数据同步延迟越大，数据一致性变差，应谨慎选择
+```
+![](./Pics/主从复制_数据同步.png)   
+3. 命令传播阶段  
+```
+  当master数据库状态被修改后，导致主从服务器数据库状态不一致，此时需要让主从数据同步到一致的状态，同步的动作称为命令传播
+  master将接收到的数据变更命令发送给slave，slave接收命令后执行命令
+  
+  命令传播阶段的部分复制：
+    命令传播阶段出现了断网现象：
+      网络闪断闪连：忽略
+      短时间网络中断：部分复制
+      长时间网络中断：全量复制
+  
+  部分复制的三个核心要素：
+    服务器的运行id（runid）
+    主服务器的复制积压缓冲区
+    主从服务器的复制偏移量
+    
+  服务器运行ID（runid）
+    概念：服务器运行ID是每一台服务器每次运行的身份识别码，一台服务器多次运行可以生成多个运行id
+    组成：运行id由40位字符组成，是一个随机的十六进制字符
+    作用：运行id被用于在服务器间进行传输，识别身份；如果两次操作均针对同一台服务器，每次操作必须携带相应的运行id，用于对方识别
+    实现方式：运行id在每台服务器启动时自动生成，master首次连接slave时，会将自己的运行ID发送给slave，slave保存此ID，通过info server命令，可   以查看节点的runid
+    
+  复制缓冲区
+    概念：复制缓冲区，又名复制积压缓冲区，是一个先进先出（FIFO）的队列，用于存储服务器执行过的命令，每次传播命令，master都会将传播的命令记   录下来，并存储在复制缓冲区。复制缓冲区默认数据存储空间大小是1M，由于存储空间大小是固定的，当入队元素的数量大于队列长度时，队首的元素会被   弹出，而新元素会入队列
+    由来：每台服务器启动时，如果开启AOF或被连接成为master节点，即创建复制缓冲区
+    作用：用于保存master收到的指令（仅影响数据变更的指令，例如set、select）
+    数据来源：当master接收到主客户端的指令时，除了执行指令，还会将该指令存储到缓冲区中
+    组成：
+      偏移量
+      字节值
+    工作原理：
+      通过offset区分不同的slave当前数据传播的差异
+      master记录已发送的信息对应的offset
+      slave记录已接收的信息对应的offset
+      
+    偏移量（offset）
+      概念：一个数字，描述复制缓冲区中的指令字节位置
+      分类：
+        master复制偏移量：记录发送给所有slave的指令字节对应的位置（多个）
+        slave复制偏移量：记录slave接收master发送过来的指令字节对应的位置（一个）
+      数据来源：
+        master端：发送一次记录一次
+        slave端：接收一次记录一次
+      作用：同步信息，对比master于slave的差异，当slave断线后，恢复数据使用
+```
+![](./Pics/复制缓冲区1.png)
+![](./Pics/复制缓冲区2.png)
+![](./Pics/数据同步和命令传播.png)
