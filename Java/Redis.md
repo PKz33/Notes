@@ -1591,3 +1591,62 @@ c. 故障转移：发现问题；竞选负责人（sentinel）；优选新master
       问题出现后，临时启动防灾业务key，对key进行业务层传输加密服务，设定校验程序，对过来的key校验
       例如每天随机分配60个加密串，挑选2到3个，混淆到页面数据id中，发现访问key不满足规则，驳回数据访问
 ```
+- **性能指标监控**  
+1. 监控指标：性能指标、内存指标、基本活动指标、持久性指标、错误指标  
+2. 性能指标  
+```
+  latency：Redis响应一个请求的时间
+  instantaneous_ops_per_sec：平均每秒处理请求总数
+  hit rate：缓存命中率（计算出来的）
+```  
+3. 内存指标
+```
+  used_memory：已使用内存
+  mem_fragmentation_ratio：内存碎片率
+  evicted_keys：由于最大内存限制被移除的key的数量
+  blocked_clients：由于BLPOP，BRPOP，或者BRPOP，LPUSH而被阻塞的客户端
+```  
+4. 基本活动指标  
+```
+  connected_clients：客户端连接数
+  connected_slaves：Slave数量
+  master_last_io_seconds_ago：最近一次主从交互之后的秒数
+  keyspace：数据库中的key值总数
+```  
+5. 持久性指标  
+```
+  rdb_last_save_time：最后一次持久化保存到磁盘的时间戳
+  rdb_changes_since_last_save：自最后一次持久化以后数据库的更改数
+```  
+6. 错误指标
+```
+  rejected_connections：由于达到maxclient限制而被拒绝的连接数
+  keyspace_misses：Key值查找失败（没有命中）的次数
+  master_link_down_since_seconds：主从断开的持续时间（以秒为单位）  
+```
+7. 监控工具：Cloud Insight Redis/Prometheus/Redis-stat/Redis-faina/RedisLive/Zabbix  
+8. 监控命令：`benchmark`；`redis cli`：`monitor`，`showlog`  
+```
+  redis-benchmark [-h] [-p] [-c] [-n <requests>] [-k]
+  
+  50个连接，10000次请求对应的性能
+  redis-benchmark
+  
+  100个连接，5000次请求对应的性能
+  redis-benchmark -c 100 -n 5000
+  
+  redis-cli
+  打印服务器调试信息
+  monitor
+  
+  slowlog [operator]
+    get：获取慢查询日志
+    len：获取慢查询日志条数
+    reset：重置慢查询日志
+    
+  相关配置：
+    设置慢查询的时间下限，单位：微秒
+    slowlog-log-slower-than 1000
+    设置慢查询命令对应的日志显示长度，单位：命令数
+    slowlog-max-len 100
+```
