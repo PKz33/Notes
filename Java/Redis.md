@@ -1372,3 +1372,48 @@ c. 故障转移：发现问题；竞选负责人（sentinel）；优选新master
 ![](./Pics/集群数据存储设计3.png)
 ![](./Pics/集群数据存储设计4.png)
 ![](./Pics/集群数据存储设计5.png)
+4. `Redis`集群内部通讯设计  
+![](./Pics/集群内部通讯设计.png)  
+5. 示例  
+```
+  cat redis-6379.conf
+  # port 6379
+  # daemonize no
+  # dir /root/redis-5.0.5/data
+  # dbfilename dump-6379.rdb
+  # rdbcompression yes
+  # rdbchecksum yes
+  # save 10 2
+  # appendonly yes
+  # appendfsync always
+  # appendfilename appendonly-6379.aof
+  # bind 127.0.0.1
+  # databases 16
+  # cluster-enabled yes
+  # cluster-config-file nodes-6379.conf
+  # cluster-node-timeout 10000
+  
+  sed "s/6379/6380/g" redis-6379.conf > redis-6380.conf
+  sed "s/6379/6381/g" redis-6379.conf > redis-6381.conf
+  sed "s/6379/6382/g" redis-6379.conf > redis-6382.conf
+  sed "s/6379/6383/g" redis-6379.conf > redis-6383.conf
+  sed "s/6379/6384/g" redis-6379.conf > redis-6384.conf
+  sed "s/6379/6385/g" redis-6379.conf > redis-6385.conf
+  
+  redis-server redis-5.0.5/conf/redis-6379.conf
+  redis-server redis-5.0.5/conf/redis-6380.conf
+  redis-server redis-5.0.5/conf/redis-6381.conf
+  redis-server redis-5.0.5/conf/redis-6382.conf
+  redis-server redis-5.0.5/conf/redis-6383.conf
+  redis-server redis-5.0.5/conf/redis-6384.conf
+  
+  ps -ef | grep redis
+  
+  redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 127.0.0.1:6382 127.0.0.1:6383 127.0.0.1:6384 --cluster-replicas 1
+  
+  redis-cli -c
+  set name pkz
+  
+  redis-cli -c -p 6382
+  get name
+```
