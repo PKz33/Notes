@@ -1267,3 +1267,97 @@ e. 高可用基石：基于主从复制，构建哨兵模式与集群，实现`R
       b. 监控主从节点延迟（通过offset）判断，如果slave延迟过大，暂时屏蔽程序对该slave的数据访问
         slave-serve-stale-data yes|no：开启后仅响应info、slaveof等少数命令（慎用，除非对数据一致性要求很高）
 ```
+- **哨兵**  
+1. 哨兵（`sentinel`）：一个分布式系统中，对主从结构中的每台服务器进行监控，当出现故障时通过投票机制选择新的`master`并将所有`slave`连接到新的`master`  
+2. 作用  
+```
+  监控：
+    不断检查master和slave是否正常运行
+    master存活检测、master与slave运行情况检测
+  通知：
+    当被监控的服务器出现问题时，向其他（哨兵，客户端）发送通知
+  自动故障转移
+    断开master与slave连接，选取一个slave作为master，将其他slave连接到新的master，并告知客户端新的服务器地址
+    
+  注意：
+    哨兵也是一台redis服务器，只是不提供数据服务
+    通常哨兵配置数量为单数
+```
+3. 配置哨兵  
+```
+  配置一拖二的主从结构
+  配置三个哨兵（配置相同，端口不同）
+  启动哨兵：
+    redis-sentinel sentinel-端口号.conf
+    
+  cat sentinel.conf | grep -v "#" | grep -v "^$" > ./conf/sentinel-26379.conf
+  
+  cat sentinel-26379.conf
+  # port 26379
+  # dir /root/redis-5.0.5/data
+  # sentinel monitor mymaster 127.0.0.1 6379 2
+  # sentinel down-after-milliseconds mymaster 30000
+  # sentinel parallel-syncs mymaster 1
+  # sentinel failover-timeout mymaster 180000
+  
+  sed 's/26379/26380/g' sentinel-26379.conf > sentinel-26380.conf
+  sed 's/26379/26381/g' sentinel-26379.conf > sentinel-26381.conf
+  
+  sed 's/6380/6381/g' redis-6380.conf > redis-6381.conf
+  
+  redis-server redis-5.0.5/conf/redis-6379.conf
+  redis-server redis-5.0.5/conf/redis-6380.conf
+  redis-server redis-5.0.5/conf/redis-6381.conf
+  
+  redis-sentinel redis-5.0.5/conf/sentinel-26379.conf
+  redis-sentinel redis-5.0.5/conf/sentinel-26380.conf
+  redis-sentinel redis-5.0.5/conf/sentinel-26381.conf
+  
+  redis-cli -p 6379
+  set name pkz
+  
+  redis-cli -p 6380
+  get name
+```
+- **哨兵工作原理**  
+1. 哨兵在进行主从切换过程中经历三个阶段：  
+a. 监控：同步信息    
+b. 通知：保持联通  
+c. 故障转移：发现问题；竞选负责人（sentinel）；优选新master；选出新master，其他slave切换master，原master故障恢复后作为slave连接新master   
+2. 监控阶段  
+```
+  同步各个节点的状态信息：
+    获取各个sentinel的状态（是否在线）
+    获取master的状态：
+      master属性：
+        runid
+        role：master
+      各个slave的详细信息
+    获取所有slave的状态（根据master中的slave信息）：
+      slave属性：
+        runid
+        role：slave
+        master_host、master_port
+        offset
+```
+![](./Pics/哨兵_监控阶段.png)  
+3. 通知阶段  
+![](./Pics/哨兵_通知阶段.png)  
+4. 故障转移阶段  
+```
+  通过投票竞选负责人（负责sentinel）
+
+  服务器列表中挑选备选master考虑因素：
+    是否在线
+    响应快慢
+    与原master断开时间长短
+    优先原则：
+      优先级
+      offset
+      runid
+   
+  选出新的master后，由sentinel通知新的master：
+    向新的master发送slaveof no one
+    向其他slave发送slaveof 新master的IP 新master的端口
+```
+![](./Pics/哨兵_故障转移阶段.png)
