@@ -348,7 +348,7 @@ d. `@Repository`：一般用在持久层
   // 根据id获取bean对象
   IAccountService as = (IAccountService)ac.getBean("accountServiceImpl");
 ```
-e. 以上三个注解的作用和属性与`@Component`是一模一样，是`spring`框架提供明确的三层使用的注解，使三层对象更加清晰
+e. 以上三个注解的作用和属性与`@Component`是一模一样，是`spring`框架提供明确的三层使用的注解，使三层对象更加清晰   
 2. 用于注入数据的：作用就和在XML配置文件中的`bean`标签中写一个`<property>`标签的作用一样  
 a. `@Autowired`  
 作用：自动按照类型注入，只要容器中唯一的一个`bean`对象类型和要注入的变量类型匹配，就可以注入成功。如果`ioc`容器中没有任何`bean`的类型和要注入的变量类型匹配，则报错。  
