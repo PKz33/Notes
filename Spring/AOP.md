@@ -77,7 +77,7 @@ c. `newProxyInstance`方法的参数：
 ```
 3. 基于子类的动态代理  
 a. 涉及类`Enhancer`，由第三方`cglib`库提供  
-b. 使用`Enhancer`类中的`create`方法创建代理对象，被带离类不能是最终类  
+b. 使用`Enhancer`类中的`create`方法创建代理对象，被代理类不能是最终类  
 c. `create`方法的参数：  
 `Class`：字节码，用于指定被代理对象的字节码  
 `Callback`：用于提供增强的代码，编写如何代理。一般都是写一个该接口的实现类，通常情况下都是匿名内部类，但不是必须的。一般写该接口的子接口实现类：`MethodInterceptor`
