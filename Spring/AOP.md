@@ -30,7 +30,7 @@
   public class Client {
     public static void main(String[] args) {
       // 厂家直销
-      Producer Producer = new ProxyProducer();
+      Producer Producer = new Producer();
       Producer.saleProduct(1000f);
     }
   }
