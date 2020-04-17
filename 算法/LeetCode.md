@@ -737,3 +737,20 @@ class Solution {
             + dfs(r, c+1, m, n, k, visited) + dfs(r, c-1, m, n, k, visited) + 1;
     }
 ```
+- **找树左下角的值**   
+```
+  public int findBootomLeftValue(TreeNode root){
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    while(!queue.isEmpty()){
+      root = queue.poll();
+      if(root.right != null){
+        queue.offer(root.right);
+      }
+      if(root.left != null){
+        queue.offer(root.left)
+      }
+    }
+    return root.val;
+  }
+```
