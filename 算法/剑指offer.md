@@ -176,3 +176,15 @@ public int MoreThanHalfNum_Solution(int[] nums) {
     return res[index - 1];
   }
 ```
+- **连续子数组的最大和**  
+```
+  public int findGreatestSumOfSubArray(int[] arr){
+    int sum = 0;
+    int res = Integer.MIN_VALUE;
+    for(int num : arr){
+      sum = sum <= 0 ? num : sum + num;
+      res = Math.max(sum, res);
+    }
+    return res;
+  }
+```
