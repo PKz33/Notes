@@ -754,3 +754,17 @@ class Solution {
     return root.val;
   }
 ```
+- **盛最多水的容器**  
+```
+    public int maxArea(int[] height) {
+        int l = 0, h = height.length - 1;
+        int res = 0;
+        while(l < h){
+            // 错误写法
+            // res = height[l] < height[h] ? Math.max(res, height[l++] * (h - l)) : Math.max(res, height[h--] * (h - l));
+            // 正确写法
+            res = height[l] < height[h] ? Math.max(res, (h - l) * height[l++]) : Math.max(res, (h - l) * height[h--]);
+        }
+        return res; 
+    }
+```
