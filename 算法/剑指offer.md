@@ -663,6 +663,34 @@ public int MoreThanHalfNum_Solution(int[] nums) {
     }
     
 // 🔺字符串的排列
+    ArrayList<String> l;
+    public ArrayList<String> Permutation(String str) {
+        l = new ArrayList<>();
+        per(str.toCharArray(), 0);
+        Collections.sort(l);
+        return l;
+    }
+    
+    public void per(char[] c, int idx){
+        if(idx == c.length - 1){
+            String s = String.valueOf(c);
+            if(!l.contains(s)){
+                l.add(s);
+            }
+        }else{
+            for(int i = idx, j = i;j < c.length;j++){
+                swap(c, i, j);
+                per(c, i+1);
+                swap(c, i, j);
+            }
+        }
+    }
+    
+    public void swap(char[] c, int i, int j){
+        char t = c[i];
+        c[i] = c[j];
+        c[j] = t;
+    }
 
 
 // 数组中出现次数超过一半的数字
@@ -710,4 +738,75 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
         return res;
     }
+    
+// 🔺整数中1出现的次数（从1到n整数中1出现的次数）
+    public int NumberOf1Between1AndN_Solution(int n) {
+        int res = 0;
+        int a = 0, b = 0;
+        for(int i = 1;i <= n;i *= 10){
+            a = n / i;
+            b = n % i;
+            res += (a + 8) / 10 * i + (a % 10 == 1 ? b + 1 : 0); 
+        }
+        return res;
+    }
+    
+// 🔺把数组排成最小的数
+    public String PrintMinNumber(int [] numbers) {
+        String[] arr = new String[numbers.length];
+        int i = 0;
+        for(int num : numbers){
+            arr[i++] = String.valueOf(num);
+        }
+        Arrays.sort(arr, (s1, s2) -> (s1 + s2).compareTo(s2 + s1));
+        StringBuilder sb = new StringBuilder();
+        for(String s : arr){
+            sb.append(s);
+        }
+        return String.valueOf(sb);
+    }
+    
+// 丑数
+    public int GetUglyNumber_Solution(int n) {
+        if(n < 7){
+            return n;
+        }
+        int p2 = 0, p3 = 0, p5 = 0;
+        int[] res = new int[n];
+        res[0] = 1;
+        for(int i = 1;i < n;i++){
+            res[i] = Math.min(res[p2] * 2, Math.min(res[p3] * 3, res[p5] * 5));
+            if(res[i] == res[p2] * 2){
+                p2++;
+            }
+            if(res[i] == res[p3] * 3){
+                p3++;
+            }
+            if(res[i] == res[p5] * 5){
+                p5++;
+            }
+        }
+        return res[n - 1];
+    }
+    
+// 第一个只出现一次的字符
+    public int FirstNotRepeatingChar(String str) {
+        byte[] arr = new byte[128];
+        for(char c : str.toCharArray()){
+            arr[c]++;
+        }
+        for(int i = 0;i < str.length();i++){
+            if(arr[str.charAt(i)] > 1){
+                continue;
+            }else{
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+// 🔺数组中的逆序对
+
+
+// 
 ```
