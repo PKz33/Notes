@@ -416,3 +416,170 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         return pre;
     }
 ```
+
+// 合并两个排序的链表
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        ListNode list3 = new ListNode(-1);
+        ListNode l = list3;
+        while(list1 != null && list2 != null){
+            if(list1.val < list2.val){
+                l.next = list1;
+                list1 = list1.next;
+            }else{
+                l.next = list2;
+                list2 = list2.next;
+            }
+            l = l.next;
+        }
+        l.next = list1 == null ? list2 : list1;
+        return list3.next;
+    }
+    
+// 🔺树的子结构
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        boolean res = false;
+        if(root1 != null && root2 != null){
+            if(root1.val == root2.val){
+                res = sub(root1, root2);
+            }
+            if(res == false){
+                return HasSubtree(root1.left, root2) || HasSubtree(root1.right, root2);
+            }
+        }
+        return res;
+    }
+    
+    public boolean sub(TreeNode node1, TreeNode node2){
+        if(node2 == null){
+            return true;
+        }
+        if(node1 == null){
+            return false;
+        }
+        if(node1.val != node2.val){
+            return false;
+        }
+        return sub(node1.left, node2.left) && sub(node1.right, node2.right);
+    }
+    
+// 二叉树的镜像
+    public void Mirror(TreeNode root) {
+        if(root == null){
+            return;
+        }
+        TreeNode t = root.left;
+        root.left = root.right;
+        root.right = t;
+        Mirror(root.left);
+        Mirror(root.right);
+    }
+    
+// 🔺顺时针打印矩阵
+    public ArrayList<Integer> printMatrix(int [][] matrix) {
+        ArrayList<Integer> res = new ArrayList<>();
+        int rb = 0, cb = 0;
+        int re = matrix.length - 1, ce = matrix[0].length - 1;
+        while(rb <= re && cb <= ce){
+            for(int i = cb;i <= ce;i++){
+                res.add(matrix[rb][i]);
+            }
+            for(int i = rb+1;i <= re;i++){
+                res.add(matrix[i][ce]);
+            }
+            if(re > rb){
+                for(int i = ce-1;i >= cb;i--){
+                    res.add(matrix[re][i]);
+                }
+            }
+            if(ce > cb){
+                for(int i = re-1;i > rb;i--){
+                    res.add(matrix[i][cb]);
+                }
+            }
+            rb++;
+            cb++;
+            re--;
+            ce--;
+        }
+        return res;
+    }
+  
+// 包含min函数的栈
+    Stack<Integer> s1 = new Stack<>();
+    Stack<Integer> s2 = new Stack<>();
+    
+    public void push(int node) {
+        s1.push(node);
+        s2.push(s2.isEmpty() ? node : Math.min(node, s2.peek()));
+    }
+    
+    public void pop() {
+        s1.pop();
+        s2.pop();
+    }
+    
+    public int top() {
+        return s1.peek();
+    }
+    
+    public int min() {
+        return s2.peek();
+    }
+    
+// 🔺栈的压入、弹出序列
+    public boolean IsPopOrder(int [] pushA,int [] popA) {
+        Stack<Integer> s = new Stack<>();
+        for(int i = 0, j = 0;i < pushA.length;i++){
+            s.push(pushA[i]);
+            while(!s.isEmpty() && s.peek() == popA[j]){
+                s.pop();
+                j++;
+            }
+        }
+        return s.isEmpty();
+    }
+          
+// 从上往下打印二叉树
+    public ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        ArrayList<Integer> res = new ArrayList<>();
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(root);
+        TreeNode t = null;
+        while(!q.isEmpty()){
+            int cnt = q.size();
+            while(cnt-- > 0){
+                t = q.poll();
+                if(t == null){
+                    continue;
+                }
+                res.add(t.val);
+                q.offer(t.left);
+                q.offer(t.right);
+            }
+        }
+        return res;
+    }
+  
+// 🔺二叉搜索树的后续遍历序列
+    public boolean VerifySquenceOfBST(int [] sequence) {
+        if(sequence.length == 0){
+            return false;
+        }
+        return verify(sequence, 0, sequence.length-1);
+    }
+    
+    public boolean verify(int[] sequence, int l, int r){
+        if(l >= r){
+            return true;
+        }
+        int cut = l;
+        while(cut < r && sequence[cut] < sequence[r]){
+            cut++;
+        }
+        for(int i = cut;i < r;i++){
+            if(sequence[i] < sequence[r]){
+                return false;
+            }
+        }
+        return verify(sequence, l, cut-1) && verify(sequence, cut, r-1);
+    }
