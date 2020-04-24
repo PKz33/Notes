@@ -35,4 +35,3 @@
 - [Numpy](./Python/Numpy.md)
 - [Pandas](./Python/Pandas.md)  
 - [Tensorflow](./Python/Tensorflow.md) 
-![](./1.jpg)
