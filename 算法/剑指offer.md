@@ -415,7 +415,6 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
         return pre;
     }
-```
 
 // 合并两个排序的链表
     public ListNode Merge(ListNode list1,ListNode list2) {
@@ -583,3 +582,4 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
         return verify(sequence, l, cut-1) && verify(sequence, cut, r-1);
     }
+```
