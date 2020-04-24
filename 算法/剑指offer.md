@@ -582,4 +582,132 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
         return verify(sequence, l, cut-1) && verify(sequence, cut, r-1);
     }
+    
+// 🔺二叉树中和为某一值的路径
+    ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+    public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int target) {
+        find(root, target, new ArrayList<Integer>());
+        return res;
+    }
+    
+    public void find(TreeNode node, int target, ArrayList<Integer> cur){
+        if(node == null){
+            return;
+        }
+        cur.add(node.val);
+        target -= node.val;
+        if(target == 0 && node.left == null && node.right == null){
+            res.add(new ArrayList(cur));
+        }else{
+            find(node.left, target, cur);
+            find(node.right, target, cur);
+        }
+        cur.remove(cur.size()-1);
+    }
+    
+// 🔺复杂链表的复制
+    public RandomListNode Clone(RandomListNode pHead)
+    {
+        if(pHead == null){
+            return null;
+        }
+        RandomListNode head = null;
+        RandomListNode cur = pHead;
+        RandomListNode t = null;
+        while(cur != null){
+            t = new RandomListNode(cur.label);
+            t.next = cur.next;
+            cur.next = t;
+            cur = t.next;
+        }
+        cur = pHead;
+        while(cur != null){
+            t = cur.next;
+            if(cur.random != null){
+                t.random = cur.random.next;
+            }
+            cur = t.next;
+        }
+        head = pHead.next;
+        cur = pHead;
+        while(cur.next != null){
+            t = cur.next;
+            cur.next = t.next;
+            cur = t;
+        }
+        return head;
+    }
+    
+// 🔺二叉搜索树与双向链表
+    TreeNode head = null;
+    TreeNode pre = null;
+    public TreeNode Convert(TreeNode pRootOfTree) {
+        inOrder(pRootOfTree);
+        return head;
+    }
+    
+    public void inOrder(TreeNode node){
+        if(node == null){
+            return;
+        }
+        inOrder(node.left);
+        if(head == null){
+            head = node;
+        }
+        node.left = pre;
+        if(pre != null){
+            pre.right = node;
+        }
+        pre = node;
+        inOrder(node.right);
+    }
+    
+// 🔺字符串的排列
+
+
+// 数组中出现次数超过一半的数字
+    public int MoreThanHalfNum_Solution(int [] array) {
+        int index = array[0];
+        int cnt = 1;
+        for(int i = 1;i < array.length;i++){
+            cnt = array[i] == index ? cnt + 1 : cnt - 1;
+            if(cnt == 0){
+                index = array[i];
+                cnt = 1;
+            }
+        }
+        cnt = 0;
+        for(int num : array){
+            if(num == index){
+                cnt++;
+            }
+        }
+        return cnt > (array.length >> 1) ? index : 0;
+    }
+    
+// 最小的K个数
+    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
+        if(k > input.length){
+            return new ArrayList<Integer>();
+        }
+        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> (o2 - o1));
+        for(int n : input){
+            q.offer(n);
+            if(q.size() > k){
+                q.poll();
+            }
+        }
+        return new ArrayList<Integer>(q);
+    }
+    
+// 连续子数组的最大和
+    public int FindGreatestSumOfSubArray(int[] array) {
+        int sum = 0;
+        int res = Integer.MIN_VALUE;
+        for(int num : array){
+            sum = sum <= 0 ? num : sum + num;
+            res = Math.max(res, sum);
+        }
+        return res;
+    }
 ```
