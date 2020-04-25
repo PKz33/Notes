@@ -931,4 +931,130 @@ public int MoreThanHalfNum_Solution(int[] nums) {
             }
         }
     }
+    
+// 🔺和为S的连续正数序列
+    public ArrayList<ArrayList<Integer> > FindContinuousSequence(int sum) {
+        int l = 1, r = 2;
+        int cur = 0;
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        while(l < r){
+            cur = (l + r) * (r - l + 1) >> 1;
+            if(cur == sum){
+                ArrayList<Integer> lis = new ArrayList<>();
+                for(int i = l;i <= r;i++){
+                    lis.add(i);
+                }
+                res.add(lis);
+                l++;
+            }else if(cur < sum){
+                r++;
+            }else{
+                l++;
+            }
+        }
+        return res;
+    }
+    
+// 和为S的两个数字
+    public ArrayList<Integer> FindNumbersWithSum(int [] array,int sum) {
+        int l = 0, r = array.length - 1;
+        int cur = 0;
+        ArrayList<Integer> res = new ArrayList<>();
+        while(l < r){
+            cur = array[l] + array[r];
+            if(cur == sum){
+                res.add(array[l]);
+                res.add(array[r]);
+                return res;
+            }else if(cur < sum){
+                l++;
+            }else{
+                r--;
+            }
+        }
+        return res;
+    }
+    
+// 左旋转字符串
+    public String LeftRotateString(String str,int n) {
+        if(str.length() == 0){
+            return "";
+        }
+        n %= str.length();
+        StringBuilder sb = new StringBuilder(str);
+        sb.append(str);
+        return String.valueOf(sb.substring(n, n + str.length()));
+    }
+    
+// 翻转单词顺序列
+    public String ReverseSentence(String str) {
+        if("".equals(str.trim())){
+            return str;
+        }
+        String[] arr = str.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for(int i = arr.length - 1;i >= 0;i--){
+            sb.append(arr[i]);
+            if(i != 0){
+                sb.append(" ");
+            }
+        }
+        return String.valueOf(sb);
+    }
+    
+// 🔺扑克牌顺子
+    public boolean isContinuous(int [] numbers) {
+        if(numbers.length != 5){
+            return false;
+        }
+        byte[] arr = new byte[14];
+        int max = -1, min = 14;
+        for(int num : numbers){
+            if(num == 0){
+                continue;
+            }
+            arr[num]++;
+            if(arr[num] > 1){
+                return false;
+            }
+            max = max < num ? num : max;
+            min = min > num ? num : min;
+        }
+        return (max - min) < 5;
+    }
+    
+// 🔺孩子们的游戏（圆圈中最后剩下的数）
+    public int LastRemaining_Solution(int n, int m) {
+        if(n == 0 || m == 0){
+            return -1;
+        }
+        LinkedList<Integer> l = new LinkedList<>();
+        for(int i = 0;i < n;i++){
+            l.offer(i);
+        }
+        int cur = 0;
+        while(l.size() > 1){
+            cur = (cur + m - 1) % l.size();
+            l.remove(cur);
+        }
+        return l.get(0);
+    }
+    
+// 🔺求1+2+3+...+n
+    public int Sum_Solution(int n) {
+        int res = n;
+        boolean t = (n != 0) && ((res += Sum_Solution(n - 1)) == 666);
+        return res;
+    }
+    
+// 🔺不用加减乘除做加法
+    public int Add(int num1,int num2) {
+        int t = 0;
+        while(num1 != 0){
+            t = num1 ^ num2;
+            num1 = (num1 & num2) << 1;
+            num2 = t;
+        }
+        return num2;
+    }
 ```
