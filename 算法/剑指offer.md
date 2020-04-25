@@ -1057,4 +1057,287 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
         return num2;
     }
+    
+// 把字符串转换成整数
+    public int StrToInt(String str) {
+        if(0 == str.length()){
+            return 0;
+        }
+        boolean isNega = str.charAt(0) == '-' ? true : false;
+        int res = 0;
+        char c = ' ';
+        int cur = 0;
+        for(int i = 0;i < str.length();i++){
+            c = str.charAt(i);
+            if(i == 0 && (c == '-' || c == '+')){
+                continue;
+            }
+            if(c < '0' || c > '9'){
+                return 0;
+            }
+            cur = c - '0';
+            if(res == Integer.MAX_VALUE / 10){
+                if((isNega == false && cur > 7) || (isNega == true && cur > 8)){
+                    return 0;
+                }
+            }
+            res = res * 10 + cur;
+        }
+        return isNega == true ? -res : res;
+    }
+    
+// 🔺数组中重复的数字
+    public boolean duplicate(int numbers[],int length,int [] duplication) {
+        int t = 0;
+        for(int i = 0;i < length;i++){
+            while(numbers[i] != i){
+                if(numbers[i] == numbers[numbers[i]]){
+                    duplication[0] = numbers[i];
+                    return true;
+                }
+                t = numbers[i];
+                numbers[i] = numbers[numbers[i]];
+                numbers[t] = t;
+            }
+        }
+        return false;
+    }
+    
+// 🔺构建乘积数组
+    public int[] multiply(int[] A) {
+        int len = A.length;
+        int[] B = new int[len];
+        B[0] = 1;
+        for(int i = 1;i < len;i++){
+            B[i] = B[i - 1] * A[i - 1];
+        }
+        int t = 1;
+        for(int i = len - 1;i >= 0;i--){
+            B[i] *= t;
+            t *= A[i]; 
+        }
+        return B;
+    }
+    
+// 🔺正则表达式匹配
+    
+// 🔺表示数值的字符串
+    public boolean isNumeric(char[] str) {
+        boolean sig = false, point = false, eE = false;
+        for(int i = 0;i < str.length;i++){
+            if(str[i] == '+' || str[i] == '-'){
+                if(sig && str[i-1] != 'e' && str[i-1] != 'E'){
+                    return false;
+                }
+                if(i > 0 && !sig && str[i-1] != 'e' && str[i-1] != 'E'){
+                    return false;
+                }
+                sig = true;
+            }else if(str[i] == 'e' || str[i] == 'E'){
+                if(i == str.length-1){
+                    return false;
+                }
+                if(eE){
+                    return false;
+                }
+                eE = true;
+            }else if(str[i] == '.'){
+                if(eE || point){
+                    return false;
+                }
+                point = true;
+            }else if(str[i] < '0' || str[i] > '9'){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+// 🔺字符流中第一个不重复的字符
+    Queue<Character> q = new LinkedList<>();
+    int[] c = new int[128];
+    //Insert one char from stringstream
+    public void Insert(char ch)
+    {
+        c[ch]++;
+        q.offer(ch);
+        while(!q.isEmpty() && c[q.peek()] > 1){
+            q.poll();
+        }
+    }
+  //return the first appearence once char in current stringstream
+    public char FirstAppearingOnce()
+    {
+        return q.isEmpty() ? '#' : q.peek();
+    }
+    
+// 链表中环的入口结点
+    public ListNode EntryNodeOfLoop(ListNode pHead)
+    {
+        if(pHead == null || pHead.next == null){
+            return null;
+        }
+        ListNode fast = pHead.next.next, slow = pHead.next;
+        while(fast != slow && fast != null ){
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        if(fast == null){
+            return null;
+        }
+        fast = pHead;
+        while(fast != slow){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return fast;
+    }
+    
+// 🔺删除链表中重复的结点
+    public ListNode deleteDuplication(ListNode pHead)
+    {
+        ListNode h = new ListNode(-1);
+        h.next = pHead;
+        ListNode pre = h;
+        ListNode cur = h.next;
+        while(cur != null){
+            if(cur.next != null && cur.val == cur.next.val){
+                while(cur.next != null && cur.val == cur.next.val){
+                    cur = cur.next;
+                }
+                pre.next = cur.next;
+                cur = cur.next;
+            }else{
+                pre = cur;
+                cur = cur.next;
+            }
+        }
+        return h.next;
+    }
+    
+// 🔺二叉树的下一个结点
+    public TreeLinkNode GetNext(TreeLinkNode pNode)
+    {
+        TreeLinkNode t = null;
+        if(pNode.right != null){
+            t = pNode.right;
+            while(t.left != null){
+                t = t.left;
+            }
+            return t;
+        }
+        while(pNode.next != null){
+            t = pNode.next;
+            if(t.left == pNode){
+                return t;
+            }
+            pNode = pNode.next;
+        }
+        return null;
+    }
+    
+// 🔺对称二叉树
+    boolean isSymmetrical(TreeNode pRoot)
+    {
+        if(pRoot == null){
+            return true;
+        }
+        return sym(pRoot.left, pRoot.right);
+    }
+    
+    boolean sym(TreeNode left, TreeNode right){
+        if(left == null && right == null){
+            return true;
+        }
+        if((left == null && right != null) || (right == null && left != null)){
+            return false;
+        }
+        return left.val == right.val && sym(left.left, right.right) && sym(left.right, right.left);
+    }
+    
+// 🔺按之字形顺序打印二叉树
+    public ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        ArrayList<Integer> l = null;
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(pRoot);
+        int cnt = 0;
+        boolean rev = false;
+        TreeNode t = null;
+        while(!q.isEmpty()){
+            l = new ArrayList<>();
+            cnt = q.size();
+            while(cnt-- > 0){
+                t = q.poll();
+                if(t == null){
+                    continue;
+                }
+                l.add(t.val);
+                q.offer(t.left);
+                q.offer(t.right);
+            }
+            if(rev){
+                Collections.reverse(l);
+            }
+            if(l.size() > 0){
+                res.add(l);
+            }
+            rev = !rev;
+        }
+        return res;
+    }
+    
+// 把二叉树打印成多行
+    ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        Queue<TreeNode> q = new LinkedList<>();
+        q.offer(pRoot);
+        while(!q.isEmpty()){
+            ArrayList<Integer> l = new ArrayList<>();
+            int c = q.size();
+            while(c-- > 0){
+                TreeNode t = q.poll();
+                if(t == null){
+                    continue;
+                }
+                l.add(t.val);
+                q.offer(t.left);
+                q.offer(t.right);
+            }
+            if(l.size() > 0){
+                res.add(l);
+            }
+        }
+        return res;
+    }
+    
+// 序列化二叉树
+
+// 二叉搜索树的第k个结点
+
+// 数据流中的中位数
+
+// 滑动窗口的最大值
+
+// 矩阵中的路径
+
+// 机器人的运动范围
+
+// 剪绳子
+    public int cutRope(int n) {
+        if(n == 2){
+            return 1;
+        }
+        if(n == 3){
+            return 2;
+        }
+        int a = n / 3, b = n % 3;
+        if(b == 0){
+            return (int)Math.pow(3, a);
+        }else if(b == 1){
+            return (int)Math.pow(3, a-1) * 4;
+        }else{
+            return (int)Math.pow(3, a) * 2;
+        }
+    }
 ```
