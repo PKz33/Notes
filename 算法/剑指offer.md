@@ -806,7 +806,129 @@ public int MoreThanHalfNum_Solution(int[] nums) {
     }
     
 // 🔺数组中的逆序对
+    int[] t;
+    long res;
+    public int InversePairs(int [] array) {
+        t = new int[array.length];
+        res = 0;
+        merge(array, 0, array.length - 1);
+        return (int)(res % 1000000007);
+    }
+    
+    public void merge(int[] arr, int l, int r){
+        if(r <= l){
+            return;
+        }
+        int m = (l + r) >> 1;
+        merge(arr, l, m);
+        merge(arr, m+1, r);
+        merge(arr, l, m, r);
+    }
+    
+    public void merge(int[] arr, int l, int m, int r){
+        int i = l, j = m + 1, k = l;
+        while(i <= m || j <= r){
+            if(i > m){
+                t[k] = arr[j++];
+            }else if(j > r){
+                t[k] = arr[i++];
+            }else if(arr[i] <= arr[j]){
+                t[k] = arr[i++];
+            }else{
+                t[k] = arr[j++];
+                res += m - i + 1;
+            }
+            k++;
+        }
+        for(k = l;k <= r;k++){
+            arr[k] = t[k];
+        }
+    }
 
+// 两个链表的第一个公共结点
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        ListNode l1 = pHead1, l2 = pHead2;
+        while(l1 != l2){
+            l1 = l1 == null ? pHead2 : l1.next;
+            l2 = l2 == null ? pHead1 : l2.next;
+        }
+        return l1;
+    }
+    
+// 数字在排序数组中出现的次数
+    // 16ms 9316k
+    public int GetNumberOfK(int [] array , int k) {
+        int res = 0;
+       for(int num : array){
+           res = num == k ? res + 1 : res;
+       }
+        return res;
+    }
 
-// 
+    // 13ms 9444k
+    public int GetNumberOfK(int [] array , int k) {
+        return getr(array, k) - getl(array, k) + 1;
+    }
+    
+    public int getl(int[] arr, int k){
+        int l = 0, r = arr.length - 1;
+        int m = 0;
+        while(l <= r){
+            m = (l + r) >> 1;
+            if(arr[m] < k){
+                l = m + 1;
+            }else{
+                r = m - 1;
+            }
+        }
+        return l;
+    }
+    
+    public int getr(int[] arr, int k){
+        int l = 0, r = arr.length - 1;
+        int m = 0;
+        while(l <= r){
+            m = (l + r) >> 1;
+            if(arr[m] <= k){
+                l = m + 1;
+            }else{
+                r = m - 1;
+            }
+        }
+        return r;
+    }
+    
+// 二叉树的深度
+    public int TreeDepth(TreeNode root) {
+        return root == null ? 0 : Math.max(TreeDepth(root.left), TreeDepth(root.right)) + 1;
+    }
+    
+// 平衡二叉树
+    public boolean IsBalanced_Solution(TreeNode root) {
+        return root == null ? true : Math.abs(depth(root.left) - depth(root.right)) <= 1;
+    }
+    
+    public int depth(TreeNode node){
+        return node == null ? 0 : Math.max(depth(node.left), depth(node.right)) + 1;
+    }
+    
+// 🔺数组中只出现一次的数字
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        int diff = 0;
+        for(int num : array){
+            diff ^= num;
+        }
+        int step = 0;
+        while((diff & 1) == 0){
+            diff = diff >> 1;
+            step++;
+        }
+        for(int num : array){
+            if(((num >> step) & 1) == 0){
+                num1[0] ^= num;
+            }else{
+                num2[0] ^= num;
+            }
+        }
+    }
 ```
