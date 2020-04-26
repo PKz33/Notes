@@ -1120,6 +1120,32 @@ public int MoreThanHalfNum_Solution(int[] nums) {
     }
     
 // 🔺正则表达式匹配
+    public boolean match(char[] str, char[] pattern)
+    {
+        return match(str, pattern, 0, 0);
+    }
+    
+    public boolean match(char[] str, char[] pattern, int s, int p){
+        if(s == str.length && p == pattern.length){
+            return true;
+        }
+        if(s < str.length && p == pattern.length){
+            return false;
+        }
+        if(p + 1 < pattern.length && pattern[p + 1] == '*'){
+            if((s < str.length && pattern[p] == str[s]) || (s < str.length && '.' == pattern[p])){
+                return match(str, pattern, s, p + 2)
+                    || match(str, pattern, s + 1, p + 2)
+                    || match(str, pattern, s + 1, p);
+            }else{
+                return match(str, pattern, s, p + 2);
+            }
+        }
+        if(s < str.length && ('.' == pattern[p] || str[s] == pattern[p])){
+            return match(str, pattern, s + 1, p + 1);
+        }
+        return false;
+    }
     
 // 🔺表示数值的字符串
     public boolean isNumeric(char[] str) {
@@ -1312,16 +1338,173 @@ public int MoreThanHalfNum_Solution(int[] nums) {
     }
     
 // 序列化二叉树
+    String dstr = null;
+    String Serialize(TreeNode root) {
+        if(root == null){
+            return "#";
+        }
+        return root.val + " " + Serialize(root.left) + " " + Serialize(root.right);
+  }
+    TreeNode Deserialize(String str) {
+        if(str.length() == 0){
+            return null;
+        }
+        int idx = str.indexOf(" ");
+        String t = idx == -1 ? str : str.substring(0, idx);
+        dstr = idx == -1 ? "" : str.substring(idx + 1);
+        if("#".equals(t)){
+            return null;
+        }
+        TreeNode tn = new TreeNode(Integer.parseInt(t));
+        tn.left = Deserialize(dstr);
+        tn.right = Deserialize(dstr);
+        return tn;
+  }
 
-// 二叉搜索树的第k个结点
+// 🔺二叉搜索树的第k个结点
+    TreeNode KthNode(TreeNode pRoot, int k)
+    {
+        Stack<TreeNode> s = new Stack<>();
+        TreeNode node = pRoot;
+        int cnt = 0;
+        while(node != null || !s.isEmpty()){
+            while(node != null){
+                s.push(node);
+                node = node.left;
+            }
+            if(!s.isEmpty()){
+                node = s.pop();
+                cnt++;
+                if(cnt == k){
+                    return node;
+                }
+                node = node.right;
+            }
+        }
+        return null;
+    }
 
-// 数据流中的中位数
+// 🔺数据流中的中位数
+    PriorityQueue<Integer> p1 = new PriorityQueue<>();
+    PriorityQueue<Integer> p2 = new PriorityQueue<>((o1, o2) -> o2 - o1);
+    int cnt = 0;
+    public void Insert(Integer num) {
+        if(cnt % 2 == 0){
+            p1.offer(num);
+            int t = p1.poll();
+            p2.offer(t);
+        }else{
+            p2.offer(num);
+            int t = p2.poll();
+            p1.offer(t);
+        }
+        cnt++;
+    }
 
-// 滑动窗口的最大值
+    public Double GetMedian() {
+        return cnt % 2 == 1 ? (double)p2.peek() : ((p1.peek() + p2.peek()) / 2.0);
+    }
 
-// 矩阵中的路径
+// 🔺滑动窗口的最大值
+    // 190ms 14762k
+    public ArrayList<Integer> maxInWindows(int [] num, int size)
+    {
+        ArrayList<Integer> res = new ArrayList<>();
+        if(size < 1 || size > num.length){
+            return res;
+        }
+        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        for(int i = 0;i < size;i++){
+            q.offer(num[i]);
+        }
+        res.add(q.peek());
+        for(int i = 0, j = i + size;j < num.length;i++, j++){
+            q.remove(num[i]);
+            q.offer(num[j]);
+            res.add(q.peek());
+        }
+        return res;
+    }
+    
+    // 15ms 9300k
+    public ArrayList<Integer> maxInWindows(int [] num, int size)
+    {
+        ArrayList<Integer> res = new ArrayList<>();
+        if(size < 1 || size > num.length){
+            return res;
+        }
+        LinkedList<Integer> q = new LinkedList<>();
+        for(int i = 0;i < num.length;i++){
+            while(!q.isEmpty() && num[q.peekLast()] < num[i]){
+                q.pollLast();
+            }
+            q.addLast(i);
+            if(i - size >= q.peekFirst()){
+                q.pollFirst();
+            }
+            if(i - size + 1 >= 0){
+                res.add(num[q.peekFirst()]);
+            }
+        }
+        return res;
+    }
+
+// 🔺矩阵中的路径
+    int[][] dirs = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+    public boolean hasPath(char[] matrix, int rows, int cols, char[] str)
+    {
+        boolean[] flag = new boolean[matrix.length];
+        for(int i = 0;i < rows;i++){
+            for(int j = 0;j < cols;j++){
+                if(bc(matrix, i, j, rows, cols, flag, str, 0)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+ 
+    public boolean bc(char[] matrix, int r, int c, int rows, int cols, boolean[] flag, char[] str, int k){
+        int idx = r * cols + c;
+        if(r < 0 || r >= rows || c < 0 || c >= cols || flag[idx] == true || matrix[idx] != str[k]){
+            return false;
+        }
+        if(k == str.length - 1){
+            return true;
+        }
+        flag[idx] = true;
+        for(int[] num : dirs){
+            if(bc(matrix, r + num[0], c + num[1], rows, cols, flag, str, k + 1)){
+                return true;
+            }
+        }
+        flag[idx] = false;
+        return false;
+    }
 
 // 机器人的运动范围
+    int[][] dirs;
+    int res;
+    public int movingCount(int threshold, int rows, int cols)
+    {
+        dirs = new int[][]{{0,1}, {0,-1}, {1,0}, {-1,0}};
+        res = 0;
+        boolean[][] mark = new boolean[rows][cols];
+        bc(threshold, 0, 0, rows, cols, mark);
+        return res;
+    }
+    
+    public void bc(int thr, int r, int c, int rows, int cols, boolean[][] mark){
+        int sum = r / 10 + r % 10 + c / 10 + c % 10;
+        if(sum > thr || r < 0 || r >= rows || c < 0 || c >= cols || mark[r][c]){
+            return;
+        }
+        mark[r][c] = true;
+        res++;
+        for(int[] dir : dirs){
+            bc(thr, r + dir[0], c + dir[1], rows, cols, mark);
+        }
+    }
 
 // 剪绳子
     public int cutRope(int n) {
