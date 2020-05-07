@@ -768,3 +768,37 @@ class Solution {
         return res; 
     }
 ```
+- **火柴拼正方形**  
+```
+    public boolean makesquare(int[] nums) {
+        if(nums.length == 0){
+            return false;
+        }
+        int sum = 0;
+        for(int num : nums){
+            sum += num;
+        }
+        if(sum % 4 != 0){
+            return false;
+        }
+        return dfs(nums, 0, new int[4], sum >> 2);
+    }
+
+    public boolean dfs(int[] nums, int idx, int[] len, int s){
+        if(idx == nums.length){
+            if(len[0] == s && len[1] == s && len[2] == s && len[3] == s){
+                return true;
+            }
+        }
+        for(int i = 0;i < 4;i++){
+            if(len[i] + nums[idx] <= s){
+                len[i] += nums[idx];
+                if(dfs(nums, idx + 1, len, s)){
+                    return true;
+                }
+                len[i] -= nums[idx];
+            }
+        }
+        return false;
+    }
+```
