@@ -802,3 +802,31 @@ class Solution {
         return false;
     }
 ```
+- **验证回文字符串Ⅱ**  
+```
+    public boolean validPalindrome(String s) {
+        int l = 0, r = s.length() - 1;
+        while(l < r){
+            if(s.charAt(l) == s.charAt(r)){
+                l++;
+                r--;
+            }else{
+                boolean flag1 = true, flag2 = true;
+                for(int i = l, j = r - 1;i < j;i++, j--){
+                    if(s.charAt(i) != s.charAt(j)){
+                        flag1 = false;
+                        break;
+                    }
+                }
+                for(int i = l + 1, j = r;i < j;i++, j--){
+                    if(s.charAt(i) != s.charAt(j)){
+                        flag2 = false;
+                        break;
+                    }
+                }
+                return flag1 || flag2;
+            }
+        }
+        return true;
+    }
+```
