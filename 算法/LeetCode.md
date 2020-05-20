@@ -870,3 +870,19 @@ class Solution {
         return count;
     }
 ```
+- **长度最小的子数组**  
+```
+    public int minSubArrayLen(int s, int[] nums) {
+        int ans = Integer.MAX_VALUE;
+        int sum = 0;
+        int l = 0;
+        for(int i = 0;i < nums.length;i++){
+            sum += nums[i];
+            while(sum >= s){
+                ans = Math.min(ans, i - l + 1);
+                sum -= nums[l++];
+            }
+        }
+        return ans == Integer.MAX_VALUE ? 0 : ans;
+    }
+```
