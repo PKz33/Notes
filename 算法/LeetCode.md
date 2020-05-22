@@ -942,3 +942,25 @@ class Solution {
         return stack.isEmpty();     
     }
 ```
+- **从前序与中序遍历序列构造二叉树**  
+```
+    HashMap<Integer, Integer> m;
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        m = new HashMap<>();
+        for(int i = 0;i < inorder.length;i++){
+            m.put(inorder[i], i);
+        }
+        return build(preorder, 0, preorder.length - 1, 0);
+    }
+
+    public TreeNode build(int[] pre, int prel, int prer, int inl){
+        if(prel > prer){
+            return null;
+        }
+        TreeNode t = new TreeNode(pre[prel]);
+        int lsize = m.get(pre[prel]) - inl;
+        t.left = build(pre, prel + 1, prel + lsize, inl);
+        t.right = build(pre, prel + lsize + 1, prer, inl + lsize + 1);
+        return t;
+    }
+```
