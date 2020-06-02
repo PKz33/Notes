@@ -995,4 +995,42 @@ class Solution {
         }
         return ans;
     }
+```  
+- **路径总和**  
+```
+    public boolean hasPathSum(TreeNode root, int sum) {
+        return bc(root, sum);
+    }
+
+    public boolean bc(TreeNode node, int sum){
+        if(node == null){
+            return false;
+        }
+        sum -= node.val;
+        if(sum == 0 && node.left == null && node.right == null){
+            return true;
+        }
+        return bc(node.left, sum) || bc(node.right, sum);
+    }
+```
+- **路径总和Ⅱ**  
+```
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> ans = new ArrayList<>();
+        bc(root, sum, new ArrayList<>(), ans);
+        return ans;
+    }
+
+    public void bc(TreeNode node, int sum, List<Integer> cur, List<List<Integer>> ans){
+        if(node == null){
+            return;
+        }
+        cur.add(node.val);
+        if(sum - node.val == 0 && node.left == null && node.right == null){
+            ans.add(new ArrayList(cur));
+        }
+        bc(node.left, sum - node.val, cur, ans);
+        bc(node.right, sum - node.val, cur, ans);
+        cur.remove(cur.size() - 1);
+    }
 ```
