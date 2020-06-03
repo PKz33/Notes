@@ -656,19 +656,18 @@ class MyStack {
 class Solution {
     int ans;
     public int diameterOfBinaryTree(TreeNode root) {
-        // 注意这里
-        ans = 1;
+        ans = 0;
         depth(root);
-        return ans - 1;
+        return ans;
     }
 
-    public int depth(TreeNode root){
-        if(root == null){
+    public int depth(TreeNode node){
+        if(node == null){
             return 0;
         }
-        int l = depth(root.left);
-        int r = depth(root.right);
-        ans = Math.max(ans, l + r + 1);
+        int l = depth(node.left);
+        int r = depth(node.right);
+        ans = Math.max(ans, l + r);
         return Math.max(l, r) + 1;
     }
 }
