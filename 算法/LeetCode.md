@@ -1050,3 +1050,55 @@ class Solution {
         return ans;
     }
 ```
+- **删除链表的倒数第N个节点**  
+```
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode p1 = head;
+        while(n-- > 0){
+            p1 = p1.next;
+        }
+        if(p1 == null){
+            return head.next;
+        }
+        ListNode p2 = head;
+        while(p1.next != null){
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+        p2.next = p2.next.next;
+        return head;
+    }
+```  
+- **电话号码的字母组合**  
+```
+    HashMap<String, String> m;
+    ArrayList<String> ans;
+    public List<String> letterCombinations(String digits) {
+        m = new HashMap<>();
+        m.put("2", "abc");
+        m.put("3", "def");
+        m.put("4", "ghi");
+        m.put("5", "jkl");
+        m.put("6", "mno");
+        m.put("7", "pqrs");
+        m.put("8", "tuv");
+        m.put("9", "wxyz");
+        ans = new ArrayList<>();
+        if(digits.length() != 0){
+            bc("", digits);
+        }
+        return ans;
+    }
+
+    public void bc(String cur, String digs){
+        if(digs.length() == 0){
+            ans.add(cur);
+            return;
+        }
+        String td = digs.substring(0, 1);
+        String ts = m.get(td);
+        for(int i = 0;i < ts.length();i++){
+            bc(cur + ts.charAt(i), digs.substring(1));
+        }
+    }
+```
