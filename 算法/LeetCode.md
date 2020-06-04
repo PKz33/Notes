@@ -1308,3 +1308,80 @@ class Solution {
         return t;
     }
 ```
+- **找到所有数组中消失的数字**  
+```
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        HashSet<Integer> s = new HashSet<>();
+        for(int n : nums){
+            s.add(n);
+        }
+        List<Integer> ans = new ArrayList<>();
+        for(int i = 1;i <= nums.length;i++){
+            if(!s.contains(i)){
+                ans.add(i);
+            }
+        }
+        return ans;
+    }
+```  
+- **汉明距离**  
+```
+    public int hammingDistance(int x, int y) {
+        int xor = x ^ y;
+        int ans = 0;
+        while(xor != 0){
+            ans++;
+            xor &= (xor - 1);
+        }
+        return ans;
+    }
+```  
+- **把二叉搜索树转换为累加树**  
+```
+    int sum = 0;
+    public TreeNode convertBST(TreeNode root) {
+        if(root != null){
+            convertBST(root.right);
+            sum += root.val;
+            root.val = sum;
+            convertBST(root.left);
+        }
+        return root;
+    }
+```  
+- **最短无序连续子数组**  
+```
+    public int findUnsortedSubarray(int[] nums) {
+        Stack<Integer> s = new Stack<>();
+        int l = nums.length - 1, r = 0;
+        for(int i = 0;i < nums.length;i++){
+            while(!s.isEmpty() && nums[s.peek()] > nums[i]){
+                l = Math.min(l, s.pop());
+            }
+            s.push(i);
+        }
+        s.clear();
+        for(int i = nums.length - 1;i >= 0;i--){
+            while(!s.isEmpty() && nums[s.peek()] < nums[i]){
+                r = Math.max(r, s.pop());
+            }
+            s.push(i);
+        }
+        return r - l > 0 ? r - l + 1 : 0;
+    }
+```  
+- **合并二叉树**  
+```
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if(t1 == null){
+            return t2;
+        }
+        if(t2 == null){
+            return t1;
+        }
+        t1.val += t2.val;
+        t1.left = mergeTrees(t1.left, t2.left);
+        t1.right = mergeTrees(t1.right, t2.right);
+        return t1;
+    }
+```
