@@ -1197,3 +1197,114 @@ class Solution {
         return s2.peek();
     }
 ```
+- **相交链表**  
+```
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode l1 = headA;
+        ListNode l2 = headB;
+        while(l1 != l2){
+            l1 = l1 == null ? headB : l1.next;
+            l2 = l2 == null ? headA : l2.next;
+        }
+        return l1; 
+    }
+```  
+- **打家劫舍**  
+```
+    public int rob(int[] nums) {
+        if(nums.length == 0){
+            return 0;
+        }
+        if(nums.length == 1){
+            return nums[0];
+        }
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0], nums[1]);
+        for(int i = 2;i < nums.length;i++){
+            dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i]);
+        }
+        return dp[nums.length - 1];
+    }
+```  
+- **翻转二叉树**  
+```
+    public TreeNode invertTree(TreeNode root) {
+        if(root == null){
+            return null;
+        }
+        TreeNode t = root.left;
+        root.left = root.right;
+        root.right = t;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+```  
+- **回文链表**  
+```
+    public boolean isPalindrome(ListNode head) {
+        if(head == null){
+            return true;
+        }
+        ListNode firstEnd = endOfHalf(head);
+        ListNode secondStart = firstEnd.next;
+        ListNode p1 = head;
+        ListNode t = reverse(secondStart);
+        ListNode p2 = t;
+        boolean ans = true;
+        while(ans && p2 != null){
+            if(p1.val != p2.val){
+                ans = false;
+            }
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+        // firstEnd.next = reverse(t);
+        return ans;
+    }
+
+    public ListNode endOfHalf(ListNode head){
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast.next != null && fast.next.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    public ListNode reverse(ListNode node){
+        ListNode pre = null;
+        ListNode cur = node;
+        ListNode next = null;
+        while(cur != null){
+            next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;san
+        }
+        return pre;
+    }
+```  
+- **路径总和III**  
+```
+    HashMap<Integer, Integer> m;
+    public int pathSum(TreeNode root, int sum) {
+        m = new HashMap<>();
+        m.put(0, 1);
+        return bc(root, sum, 0);
+    }
+
+    public int bc(TreeNode node, int sum, int path){
+        if(node == null){
+            return 0;
+        }
+        path += node.val;
+        int t = m.getOrDefault(path - sum, 0);
+        m.put(path, m.getOrDefault(path, 0) + 1);
+        t += bc(node.left, sum, path) + bc(node.right, sum, path);
+        m.put(path, m.get(path) - 1);
+        return t;
+    }
+```
