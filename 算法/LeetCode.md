@@ -1102,3 +1102,98 @@ class Solution {
         }
     }
 ```
+- **爬楼梯**  
+```
+    public int climbStairs(int n) {
+        if(n < 3){
+            return n;
+        }
+        int p1 = 1;
+        int p2 = 2;
+        int sum = 0;
+        for(int i = 3;i <= n;i++){
+            sum = p1 + p2;
+            p1 = p2;
+            p2 = sum;
+        }
+        return sum;
+    }
+```  
+- **对称二叉树**  
+```
+    public boolean isSymmetric(TreeNode root) {
+        if(root == null){
+            return true;
+        }
+        return isSymmetric(root.left, root.right);
+    }
+
+    public boolean isSymmetric(TreeNode left, TreeNode right){
+        if(left == null && right == null){
+            return true;
+        }
+        if(left == null || right == null){
+            return false;
+        }
+        return left.val == right.val && isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+    }
+```  
+- **二叉树的最大深度**  
+```
+    public int maxDepth(TreeNode root) {
+        if(root == null){
+            return 0;
+        }
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+```  
+- **环形链表**  
+```
+    public boolean hasCycle(ListNode head) {
+        if(head == null || head.next == null){
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while(slow != fast){
+            if(fast.next == null || fast.next.next == null){
+                return false;
+            }
+            fast = fast.next.next;
+            slow = slow.next;
+        } 
+        return true;
+    }
+```  
+- **最小栈**  
+```
+    Stack<Integer> s1;
+    Stack<Integer> s2;
+
+    public MinStack() {
+        s1 = new Stack<>();
+        s2 = new Stack<>();
+    }
+    
+    public void push(int x) {
+        s1.push(x);
+        if(s2.isEmpty()){
+            s2.push(x);
+            return;
+        }
+        s2.push(s2.peek() < x ? s2.peek() : x);
+    }
+    
+    public void pop() {
+        s1.pop();
+        s2.pop();
+    }
+    
+    public int top() {
+        return s1.peek();
+    }
+    
+    public int getMin() {
+        return s2.peek();
+    }
+```
