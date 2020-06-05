@@ -34,7 +34,7 @@ public class Sender {
     private final static String QUEUE_NAME = "mq_simple";
 
     public static void main(String[] args) throws Exception {
-        // 获取到连接
+        // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         // 创建通道
         Channel channel = connection.createChannel();
@@ -58,7 +58,7 @@ public class Receiver {
 
     public static void main(String[] args) throws Exception {
 
-        // 获取到连接
+        // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         // 创建通道
         Channel channel = connection.createChannel();
@@ -88,7 +88,7 @@ public class Sender {
     private final static String QUEUE_NAME = "mq_work";
 
     public static void main(String[] args) throws Exception {
-        // 获取到连接
+        // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         Channel channel = connection.createChannel();
 
@@ -115,7 +115,7 @@ public class Receiver1 {
 
     public static void main(String[] args) throws Exception {
 
-        // 获取到连接
+        // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         Channel channel = connection.createChannel();
 
@@ -150,7 +150,7 @@ public class Receiver2 {
 
     public static void main(String[] args) throws Exception {
 
-        // 获取到连接
+        // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         Channel channel = connection.createChannel();
 
@@ -178,8 +178,110 @@ public class Receiver2 {
     }
 }
 ```
-3. `Publish/Subscribe`发布订阅模式  
+3. `Publish/Subscribe`发布订阅模式：生产者将消息发送给交换机，交换机将消息复制同步到所有绑定的队列，消费者监听各自的队列并消费消息。如：邮件群发、群聊、广播  
 ![](./Pics/MQ_Publish_Subscribe.png)  
+```
+public class Sender {
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] args) throws Exception {
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 创建通道
+        Channel channel = connection.createChannel();
+
+        // 声明exchange
+        channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
+
+        // 消息内容
+        String message = "MQ publish subscribe";
+        channel.basicPublish(EXCHANGE_NAME, "", null, message.getBytes());
+        System.out.println("Producer sent: " + message);
+
+        channel.close();
+        connection.close();
+    }
+}
+
+public class Receiver1 {
+
+    private final static String QUEUE_NAME = "mq_publish_subscribe1";
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] argv) throws Exception {
+
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 创建通道
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
+
+        // 同一时刻只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println("Consumer1 received: " + message);
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+
+public class Receiver2 {
+
+    private final static String QUEUE_NAME = "mq_publish_subscribe2";
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] argv) throws Exception {
+
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 创建通道
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "");
+
+        // 同一时刻只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println("Consumer2 received: " + message);
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
 4. `Routing`路由模式  
 ![](./Pics/MQ_Routing.png)  
 5. `Topics`主题模式  
