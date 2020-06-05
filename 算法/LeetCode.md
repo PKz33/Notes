@@ -1385,3 +1385,36 @@ class Solution {
         return t1;
     }
 ```
+- **顺时针打印矩阵**  
+```
+    public int[] spiralOrder(int[][] matrix) {
+        if(matrix.length == 0 || matrix[0].length == 0){
+            return new int[0];
+        }
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[] ans = new int[m * n];
+        int l = 0, r = n - 1, t = 0, b = m - 1, k = 0;
+        while(l <= r && t <= b){
+            for(int col = l;col <= r;col++){
+                ans[k++] = matrix[t][col];
+            }
+            for(int row = t + 1;row <= b;row++){
+                ans[k++] = matrix[row][r];
+            }
+            if(l < r && t < b){
+                for(int col = r - 1;col >= l;col--){
+                    ans[k++] = matrix[b][col];
+                }
+                for(int row = b - 1;row > t;row--){
+                    ans[k++] = matrix[row][l];
+                }
+            }
+            l++;
+            r--;
+            t++;
+            b--;
+        }
+        return ans; 
+    }
+```
