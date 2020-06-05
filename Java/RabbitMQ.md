@@ -210,7 +210,7 @@ public class Receiver1 {
 
     private final static String EXCHANGE_NAME = "mq_exchange";
 
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // 获取连接
         Connection connection = ConnectionUtil.getConnection();
@@ -249,7 +249,7 @@ public class Receiver2 {
 
     private final static String EXCHANGE_NAME = "mq_exchange";
 
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // 获取连接
         Connection connection = ConnectionUtil.getConnection();
@@ -315,7 +315,7 @@ public class Receiver1 {
 
     private final static String EXCHANGE_NAME = "mq_exchange";
 
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // 获取连接
         Connection connection = ConnectionUtil.getConnection();
@@ -355,7 +355,7 @@ public class Receiver2 {
 
     private final static String EXCHANGE_NAME = "mq_exchange";
 
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         // 获取连接
         Connection connection = ConnectionUtil.getConnection();
@@ -397,7 +397,7 @@ public class Sender {
 
     private final static String EXCHANGE_NAME = "mq_exchange";
 
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] args) throws Exception {
         // 获取连接
         Connection connection = ConnectionUtil.getConnection();
         // 建立通道
