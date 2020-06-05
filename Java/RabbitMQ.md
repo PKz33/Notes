@@ -282,7 +282,7 @@ public class Receiver2 {
     }
 }
 ```
-4. `Routing`路由模式：生产者将消息（消息头携带路由的`key`）发送给交换机，交换机根据`key`匹配相应的消息队列，相应的消费者监听自己的队列并消费消息   
+4. `Routing`路由模式：生产者将消息（消息头携带路由的`key`）发送给交换机，交换机根据`key`精确匹配相应的消息队列，相应的消费者监听自己的队列并消费消息   
 ![](./Pics/MQ_Routing.png)  
 ```
 public class Sender {
@@ -390,5 +390,107 @@ public class Receiver2 {
     }
 }
 ```
-5. `Topics`主题模式  
+5. `Topics`主题模式：生产者将消息（消息头携带路由的`key`）发送给交换机，交换机根据`key`模糊匹配相应的消息队列，相应的消费者监听自己的队列并消费消息。通配符`#`匹配一个或多个词，`*`仅匹配一个词  
 ![](./Pics/MQ_Topics.png)  
+```
+public class Sender {
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] argv) throws Exception {
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 建立通道
+        Channel channel = connection.createChannel();
+
+        // 声明交换机，类型为“topic”
+        channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+
+        // 消息内容
+        String message = "MQ topics";
+        channel.basicPublish(EXCHANGE_NAME, "key1", null, message.getBytes());
+        System.out.println("Producer sent: " + message);
+
+        channel.close();
+        connection.close();
+    }
+}
+
+public class Receiver1 {
+
+    private final static String QUEUE_NAME = "mq_topics1";
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] args) throws Exception {
+
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 建立通道
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "key*");
+
+        // 同一时刻只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println("Consumer1 received: " + message);
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+
+public class Receiver2 {
+
+    private final static String QUEUE_NAME = "mq_topics2";
+
+    private final static String EXCHANGE_NAME = "mq_exchange";
+
+    public static void main(String[] args) throws Exception {
+
+        // 获取连接
+        Connection connection = ConnectionUtil.getConnection();
+        // 建立通道
+        Channel channel = connection.createChannel();
+
+        // 声明队列
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+        // 绑定队列到交换机
+        channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "*");
+
+        // 同一时刻只会发一条消息给消费者
+        channel.basicQos(1);
+
+        // 定义队列的消费者
+        QueueingConsumer consumer = new QueueingConsumer(channel);
+        // 监听队列，手动返回完成
+        channel.basicConsume(QUEUE_NAME, false, consumer);
+
+        // 获取消息
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            String message = new String(delivery.getBody());
+            System.out.println("Consumer2 received: " + message);
+            Thread.sleep(10);
+
+            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+        }
+    }
+}
+```
