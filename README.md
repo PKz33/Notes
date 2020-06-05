@@ -19,7 +19,8 @@
 - [Junit测试](./Java/Junit测试.md)
 - [数据库](./Java/数据库.md)
 - [设计模式](./Java/设计模式.md)
-- [Redis](./Java/Redis.md)
+- [Redis](./Java/Redis.md)  
+- [RabbitMQ](./Java/RabbitMQ.md)
 # Spring  
 - [体系结构](./Spring/体系结构.md)
 - [IOC](./Spring/IOC.md)
