@@ -1418,3 +1418,25 @@ class Solution {
         return ans; 
     }
 ```
+- **最长连续序列**  
+```
+    public int longestConsecutive(int[] nums) {
+        HashSet<Integer> s = new HashSet<>();
+        for(int num : nums){
+            s.add(num);
+        }
+        int ans = 0;
+        for(int num : nums){
+            if(!s.contains(num - 1)){
+                int cur = 1;
+                int curNum = num;
+                while(s.contains(curNum + 1)){
+                    curNum++;
+                    cur++;
+                }
+                ans = Math.max(cur, ans);
+            }
+        }
+        return ans;
+    }
+```
