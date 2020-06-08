@@ -1440,3 +1440,66 @@ class Solution {
         return ans;
     }
 ```
+- **寻找峰值**  
+```
+    public int findPeakElement(int[] nums) {
+        int l = 0, r = nums.length - 1;
+        while(l < r){
+            int m = (l + r) >> 1;
+            if(nums[m] < nums[m + 1]){
+                l = m + 1;
+            }else{
+                r = m;
+            }
+        }
+        return l;
+    }
+```  
+- **反转字符串中的单词III**  
+```
+    public String reverseWords(String s) {
+        String[] arr = s.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0;i < arr.length;i++){
+            sb.append(new StringBuilder(arr[i]).reverse());
+            if(i != arr.length - 1){
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+```  
+- **数组中的第K个最大元素**  
+```
+    public int findKthLargest(int[] nums, int k) {
+        int l = 0, r = nums.length - 1;
+        int tar = nums.length - k;
+        while(l <= r){
+            int t = part(nums, l, r);
+            if(t == tar){
+                return nums[tar];
+            }else if(t < tar){
+                l = t + 1;
+            }else{
+                r = t - 1;
+            }
+        }
+        return -1;
+    }
+
+    public int part(int[] nums, int l, int r){
+        int t = nums[l];
+        while(l < r){
+            while(l < r && nums[r] >= t){
+                r--;
+            }
+            nums[l] = nums[r];
+            while(l < r && nums[l] < t){
+                l++;
+            }
+            nums[r] = nums[l];
+        }
+        nums[l] = t;
+        return l;
+    }
+```
