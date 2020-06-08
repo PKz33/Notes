@@ -1503,3 +1503,32 @@ class Solution {
         return l;
     }
 ```
+- **字符串转换整数（atoi）**  
+```
+    public int myAtoi(String str) {
+        boolean isNeg = false;
+        int idx = 0;
+        while(idx < str.length() && ' ' == str.charAt(idx)){
+            idx++;
+        } 
+        if(idx == str.length()){
+            return 0;
+        }
+        if('-' == str.charAt(idx)){
+            isNeg = true;
+        } 
+        if('-' == str.charAt(idx) || '+' == str.charAt(idx)){
+            idx++;
+        }
+        int ans = 0;
+        while(idx < str.length() && str.charAt(idx) >= '0' && str.charAt(idx) <= '9'){
+            int t = str.charAt(idx) - '0';
+            if(ans > Integer.MAX_VALUE / 10 || (ans == Integer.MAX_VALUE / 10 && t > 7)){
+                return isNeg ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+            }
+            ans = ans * 10 + t;
+            idx++;
+        }
+        return isNeg ? -ans : ans;
+    }
+```
