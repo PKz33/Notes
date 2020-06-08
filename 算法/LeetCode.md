@@ -1532,3 +1532,19 @@ class Solution {
         return isNeg ? -ans : ans;
     }
 ```
+- **无重复字符的最长子串**  
+```
+    public int lengthOfLongestSubstring(String s) {
+        int ans = 0;
+        int l = 0;
+        HashMap<Character, Integer> m = new HashMap<>();
+        for(int i = 0;i < s.length();i++){
+            if(m.containsKey(s.charAt(i))){
+                l = Math.max(l, m.get(s.charAt(i)) + 1);
+            }
+            m.put(s.charAt(i), i);
+            ans = Math.max(ans, i - l + 1);
+        }
+        return ans;
+    }
+```
