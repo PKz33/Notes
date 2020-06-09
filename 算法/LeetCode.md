@@ -1548,3 +1548,34 @@ class Solution {
         return ans;
     }
 ```
+- **排序链表**  
+```
+    public ListNode sortList(ListNode head) {
+        if(head == null || head.next == null){
+            return head;
+        }
+        ListNode slow = head, fast = head.next;
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode t = slow.next;
+        slow.next = null;
+        ListNode l = sortList(head);
+        ListNode r = sortList(t);
+        ListNode h = new ListNode(-1);
+        ListNode ans = h;
+        while(l != null && r != null){
+            if(l.val < r.val){
+                h.next = l;
+                l = l.next;
+            }else{
+                h.next = r;
+                r = r.next;
+            }
+            h = h.next;
+        }
+        h.next = l == null ? r : l;
+        return ans.next;
+    }
+```
