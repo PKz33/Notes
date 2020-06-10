@@ -1579,3 +1579,39 @@ class Solution {
         return ans.next;
     }
 ```
+- **回文数**  
+```
+    public boolean isPalindrome(int x) {
+        if(x < 0){
+            return false;
+        }
+        String t = String.valueOf(x);
+        int l = 0, r = t.length() - 1;
+        while(l < r){
+            if(t.charAt(l) != t.charAt(r)){
+                return false;
+            }
+            l++;
+            r--;
+        }
+        return true;
+    }
+    
+    public boolean isPalindrome(int x) {
+        if(x < 0){
+            return false;
+        }
+        int t = 1;
+        while(x / t >= 10 ){
+            t *= 10;
+        }
+        while(x > 0){
+            if(x / t != x % 10){
+                return false;
+            }
+            x = x % t / 10;
+            t /= 100;
+        }
+        return true;
+    }
+```
