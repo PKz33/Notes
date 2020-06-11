@@ -1615,3 +1615,34 @@ class Solution {
         return true;
     }
 ```
+- **最长回文子串**  
+```
+    public String longestPalindrome(String s) {
+        if(s.length() < 2){
+            return s;
+        }
+        String ans = s.substring(0, 1);
+        int len = 1;
+        for(int i = 0;i < s.length() - 1;i++){
+            String s1 = centerSpread(s, i, i);
+            String s2 = centerSpread(s, i, i + 1);
+            String s3 = s1.length() > s2.length() ? s1 : s2;
+            if(s3.length() > len){
+                len = s3.length();
+                ans = s3;
+            }
+        }
+        return ans;
+    }
+
+    public String centerSpread(String s, int l, int r){
+        while(l >= 0 && r < s.length()){
+            if(s.charAt(l) != s.charAt(r)){
+                break;
+            }
+            l--;
+            r++;
+        }
+        return s.substring(l + 1, r);
+    }
+```
