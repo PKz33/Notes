@@ -1646,3 +1646,22 @@ class Solution {
         return s.substring(l + 1, r);
     }
 ```
+- **寻找两个正序数组的中位数**  
+```
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        int len1 = nums1.length;
+        int len2 = nums2.length;
+        int len = len1 + len2;
+        int p1 = 0, p2 = 0;
+        int l = 0, r = 0;
+        for(int i = 0;i <= (len >> 1);i++){
+            l = r;
+            if(p1 < len1 && (p2 >= len2 || nums1[p1] < nums2[p2])){
+                r = nums1[p1++];
+            }else{
+                r = nums2[p2++];
+            }
+        }
+        return (len & 1) == 0 ? (l + r) / 2.0 : r; 
+    }
+```
