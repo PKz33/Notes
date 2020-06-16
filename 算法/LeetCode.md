@@ -1704,3 +1704,31 @@ class Solution {
         return dp[m][n];
     }
 ```
+- **二叉树的序列化与反序列化**  
+```
+    String str;
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if(root == null){
+            return "#";
+        }
+        return root.val + " " + serialize(root.left) + " " + serialize(root.right);
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if(data.length() == 0){
+            return null;
+        }
+        int idx = data.indexOf(" ");
+        String t = idx == -1 ? data : data.substring(0, idx);
+        str = idx == -1 ? "" : data.substring(idx + 1);
+        if(t.equals("#")){
+            return null;
+        }
+        TreeNode node = new TreeNode(Integer.valueOf(t));
+        node.left = deserialize(str);
+        node.right = deserialize(str);
+        return node;
+    }
+```
