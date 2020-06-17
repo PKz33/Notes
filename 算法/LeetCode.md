@@ -1732,3 +1732,27 @@ class Solution {
         return node;
     }
 ```
+- **合并K个排序链表**  
+```
+    public ListNode mergeKLists(ListNode[] lists) {
+        if(lists == null || lists.length == 0){
+            return null;
+        }
+        PriorityQueue<ListNode> q = new PriorityQueue<>((o1, o2) -> o1.val - o2.val);
+        ListNode ans = new ListNode(0);
+        ListNode p = ans;
+        for(ListNode node : lists){
+            if(node != null){
+                q.offer(node);
+            }
+        }
+        while(!q.isEmpty()){
+            p.next = q.poll();
+            p = p.next;
+            if(p.next != null){
+                q.offer(p.next);
+            }
+        }
+        return ans.next;
+    }
+```
