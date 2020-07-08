@@ -1779,3 +1779,91 @@ class Solution {
         return slow;
     }
 ```
+- **LRU缓存机制**  
+```
+class Node {
+    int k, v;
+    Node pre, next;
+    public Node(int k, int v){
+        this.k = k;
+        this.v = v;
+    }
+}
+
+class DoubleList {
+    private Node head, tail;
+    private int size;
+
+    public DoubleList(){
+        head = new Node(0, 0);
+        tail = new Node(0, 0);
+        head.next = tail;
+        tail.pre = head;
+        size = 0;
+    }
+
+    public void addFirst(Node x){
+        x.next = head.next;
+        head.next.pre = x;
+        x.pre = head;
+        head.next = x;
+        size++;
+    }
+
+    public Node removeLast(){
+        if(head.next == tail){
+            return null;
+        }
+        Node last = tail.pre;
+        remove(last);
+        return last;
+    }
+
+    public void remove(Node x){
+        x.pre.next = x.next;
+        x.next.pre = x.pre;
+        size--;
+    }
+
+    public int size(){
+        return size;
+    }
+}
+
+class LRUCache {
+    private HashMap<Integer, Node> m;
+    private DoubleList cache;
+    private int cap;
+
+    public LRUCache(int capacity) {
+        cap = capacity;
+        m = new HashMap<>();
+        cache = new DoubleList();
+    }
+    
+    public int get(int key) {
+        if(!m.containsKey(key)){
+            return -1;
+        }
+        int val = m.get(key).v;
+        put(key, val);
+        return val;
+    }
+    
+    public void put(int key, int value) {
+        Node cur = new Node(key, value);
+        if(m.containsKey(key)){
+            cache.remove(m.get(key));
+            m.put(key, cur);
+            cache.addFirst(cur);
+        }else{
+            if(cap == cache.size()){
+                Node last = cache.removeLast();
+                m.remove(last.k);
+            }
+            cache.addFirst(cur);
+            m.put(key, cur);
+        }
+    }
+}
+```
