@@ -1867,3 +1867,20 @@ class LRUCache {
     }
 }
 ```
+- **乘积最大子数组**  
+```
+    public int maxProduct(int[] nums) {
+        int ans = Integer.MIN_VALUE, max = 1, min = 1;
+        for(int n : nums){
+            if(n < 0){
+               int t = max;
+               max = min;
+               min = t; 
+            }
+            max = Math.max(max * n, n);
+            min = Math.min(min * n, n);
+            ans = Math.max(ans, max);
+        }
+        return ans;
+    }
+```
