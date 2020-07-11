@@ -1884,3 +1884,34 @@ class LRUCache {
         return ans;
     }
 ```
+- **课程表**  
+```
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        int[] indgs = new int[numCourses];
+        List<List<Integer>> graph = new ArrayList<>();
+        Queue<Integer> q = new LinkedList<>();
+        for(int i = 0;i < numCourses;i++){
+            graph.add(new ArrayList<>());
+        }
+        for(int[] p : prerequisites){
+            indgs[p[0]]++;
+            graph.get(p[1]).add(p[0]);
+        }
+        for(int i = 0;i < numCourses;i++){
+            if(indgs[i] == 0){
+                q.offer(i);
+            }
+        }
+        while(!q.isEmpty()){
+            int pre = q.poll();
+            numCourses--;
+            for(int n : graph.get(pre)){
+                indgs[n]--;
+                if(indgs[n] == 0){
+                    q.offer(n);
+                }
+            }
+        }
+        return numCourses == 0;
+    }
+```
