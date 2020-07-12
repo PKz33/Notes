@@ -1915,3 +1915,81 @@ class LRUCache {
         return numCourses == 0;
     }
 ```
+- **实现 Trie (前缀树)**  
+```
+class Trie {
+    TireNode root;
+
+    /** Initialize your data structure here. */
+    public Trie() {
+        root = new TireNode();
+    }
+    
+    /** Inserts a word into the trie. */
+    public void insert(String word) {
+        TireNode node = root;
+        for(int i = 0;i < word.length();i++){
+            char c = word.charAt(i);
+            if(!node.containsKey(c)){
+                node.put(c, new TireNode());
+            }
+            node = node.get(c);
+        }
+        node.setEnd();
+    }
+    
+    /** Returns if the word is in the trie. */
+    public boolean search(String word) {
+        TireNode node = searchPrefix(word);
+        return node != null && node.isEnd();
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    public boolean startsWith(String prefix) {
+        return searchPrefix(prefix) != null;
+    }
+
+    public TireNode searchPrefix(String word){
+        TireNode node = root;
+        for(int i = 0;i < word.length();i++){
+            char c = word.charAt(i);
+            if(node.containsKey(c)){
+                node = node.get(c);
+            }else{
+                return null;
+            }
+        }
+        return node;
+    }
+}
+
+class TireNode {
+    TireNode[] link;
+    final int R = 26;
+    boolean isEnd;
+    
+    public TireNode(){
+        link = new TireNode[R];
+    }
+
+    public boolean containsKey(char c){
+        return link[c - 'a'] != null;
+    }
+
+    public TireNode get(char c){
+        return link[c - 'a'];
+    }
+
+    public void put(char c, TireNode node){
+        link[c - 'a'] = node;
+    }
+
+    public void setEnd(){
+        isEnd = true;
+    }
+
+    public boolean isEnd(){
+        return isEnd;
+    }
+}
+```
