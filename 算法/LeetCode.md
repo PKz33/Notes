@@ -1993,3 +1993,18 @@ class TireNode {
     }
 }
 ```
+- **每日温度**  
+```
+    public int[] dailyTemperatures(int[] T) {
+        int[] ans = new int[T.length];
+        Stack<Integer> s = new Stack<>();
+        for(int i = 0;i < T.length;i++){
+            while(!s.isEmpty() && T[i] > T[s.peek()]){
+                int t = s.pop();
+                ans[t] = i - t;
+            }
+            s.push(i);
+        }
+        return ans;
+    }
+```
