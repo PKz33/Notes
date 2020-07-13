@@ -2069,7 +2069,7 @@ class TireNode {
         return ans;
     }
 ```
--**回文子串**  
+- **回文子串**  
 ```
     public int countSubstrings(String s) {
         int ans = 0;
