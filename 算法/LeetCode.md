@@ -2034,3 +2034,38 @@ class TireNode {
         return -1;
     }
 ```
+- **最长连续递增序列**  
+```
+    public int findLengthOfLCIS(int[] nums) {
+        int ans = 0, t = 0;
+        for(int i = 0;i < nums.length;i++){
+            if(i > 0 && nums[i-1] >= nums[i]){
+                t = i;
+            }
+            ans = Math.max(ans, i - t + 1);
+        }
+        return ans;
+    }
+```  
+- **最长上升子序列**  
+```
+    public int lengthOfLIS(int[] nums) {
+        if(nums.length == 0){
+            return 0;
+        }
+        int[] dp = new int[nums.length];
+        dp[0] = 1;
+        int ans = 1;
+        for(int i = 1;i < nums.length;i++){
+            int max = 0;
+            for(int j = 0;j < i;j++){
+                if(nums[i] > nums[j]){
+                    max = Math.max(max, dp[j]);
+                }
+            }
+            dp[i] = max + 1;
+            ans = Math.max(ans, dp[i]);
+        }
+        return ans;
+    }
+```
