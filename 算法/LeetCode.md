@@ -2092,3 +2092,42 @@ class TireNode {
         return ans;
     }
 ```
+- **比特位计数**  
+```
+    public int[] countBits(int num) {
+        int[] ans = new int[num + 1];
+        int i = 0, b = 1;
+        while(b <= num){
+            while(i < b && i+b <= num){
+                ans[i+b] = ans[i] + 1;
+                i++;
+            }
+            i = 0;
+            b = b << 1;
+        }
+        return ans;
+    }
+```  
+- **全排列**  
+```
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> l = new ArrayList<>();
+        for(int num : nums){
+            l.add(num);
+        }
+        bc(l, ans, 0, nums.length);
+        return ans;
+    }
+
+    public void bc(List<Integer> l, List<List<Integer>> ans, int idx, int n){
+        if(idx == n){
+            ans.add(new ArrayList(l));
+        }
+        for(int i = idx;i < n;i++){
+            Collections.swap(l, idx, i);
+            bc(l, ans, idx + 1, n);
+            Collections.swap(l, idx, i);
+        }
+    }
+```
