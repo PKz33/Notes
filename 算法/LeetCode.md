@@ -2150,3 +2150,52 @@ class TireNode {
         }
     }
 ```
+- **组合总和**  
+```
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        Arrays.sort(candidates);
+        bc(candidates, target, 0, ans, new LinkedList<>());
+        return ans;
+    }
+
+    public void bc(int[] candidates, int cur, int idx, List<List<Integer>> ans, LinkedList<Integer> path){
+        if(cur == 0){
+            ans.add(new ArrayList(path));
+            return;
+        }
+        for(int i = idx;i < candidates.length;i++){
+            if(cur - candidates[i] < 0){
+                break;
+            }
+            path.offer(candidates[i]);
+            bc(candidates, cur-candidates[i], i, ans, path);
+            path.removeLast();
+        }
+    }
+```  
+- **括号生成**  
+```
+    public List<String> generateParenthesis(int n) {
+        List<String> ans = new ArrayList<>();
+        bc(ans, new StringBuilder(), 0, 0, n);
+        return ans;
+    }
+
+    public void bc(List<String> ans, StringBuilder sb, int l, int r, int n){
+        if(sb.length() == (n << 1)){
+            ans.add(sb.toString());
+            return;
+        }
+        if(l < n){
+            sb.append("(");
+            bc(ans, sb, l+1, r, n);
+            sb.deleteCharAt(sb.length()-1);
+        }
+        if(r < l){
+            sb.append(")");
+            bc(ans, sb, l, r+1, n);
+            sb.deleteCharAt(sb.length()-1);
+        }
+    }
+```
