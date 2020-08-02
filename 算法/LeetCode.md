@@ -2286,3 +2286,29 @@ class TireNode {
         return Math.max(dp[n-1][1], dp[n-1][2]);
     }
 ```
+- **打家劫舍III**  
+```
+    public int rob(TreeNode root) {
+        HashMap<TreeNode, Integer> m = new HashMap<>();
+        return rob(root, m);
+    }
+
+    public int rob(TreeNode node, HashMap<TreeNode, Integer> m){
+        if(node == null){
+            return 0;
+        }
+        if(m.containsKey(node)){
+            return m.get(node);
+        }
+        int cur = node.val;
+        if(node.left != null){
+            cur += rob(node.left.left, m) + rob(node.left.right, m);
+        }
+        if(node.right != null){
+            cur += rob(node.right.left, m) + rob(node.right.right, m);
+        }
+        int ans = Math.max(cur, rob(node.left, m) + rob(node.right, m));
+        m.put(node, ans);
+        return ans;
+    }
+```
