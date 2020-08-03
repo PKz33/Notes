@@ -2312,3 +2312,45 @@ class TireNode {
         return ans;
     }
 ```
+- **搜索二维矩阵II**
+```
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if(matrix.length == 0 || matrix[0].length == 0){
+            return false;
+        }
+        int i = 0, j = matrix[0].length - 1;
+        while(i < matrix.length && j >= 0){
+            if(matrix[i][j] == target){
+                return true;
+            }else if(matrix[i][j] < target){
+                i++;
+            }else{
+                j--;
+            }
+        }
+        return false;
+    }
+```  
+- **最大正方形**  
+```
+    public int maximalSquare(char[][] matrix) {
+        if(matrix.length == 0 || matrix[0].length == 0){
+            return 0;
+        }
+        int t = 0;
+        int[][] dp = new int[matrix.length][matrix[0].length];
+        for(int i = 0;i < matrix.length;i++){
+            for(int j = 0;j < matrix[0].length;j++){
+                if(matrix[i][j] == '1'){
+                    if(i == 0 || j == 0){
+                        dp[i][j] = 1;
+                    }else{
+                        dp[i][j] = Math.min(dp[i-1][j-1], Math.min(dp[i-1][j], dp[i][j-1])) + 1;
+                    }
+                    t = Math.max(t, dp[i][j]);
+                }
+            }
+        }
+        return t * t;
+    }
+```
