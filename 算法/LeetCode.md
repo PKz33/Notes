@@ -2367,3 +2367,58 @@ class TireNode {
         return dp[n];
     }
 ```
+- **在排序数组中查找元素的第一个和最后一个位置**
+```
+    public int[] searchRange(int[] nums, int target) {
+        int[] ans = new int[2];
+        ans[0] = getStart(nums, target);
+        ans[1] = getEnd(nums, target);
+        return ans;
+    }
+
+    public int getStart(int[] nums, int target){
+        int l = 0, r = nums.length - 1;
+        while(l <= r){
+            int m = (l + r) >> 1;
+            if(nums[m] >= target){
+                r = m-1;
+            }else{
+                l = m+1;
+            }
+        }
+        return (l >= nums.length || nums[l] != target)? -1 : l;
+    }
+
+    public int getEnd(int[] nums, int target){
+        int l = 0, r = nums.length - 1;
+        while(l <= r){
+            int m = (l + r) >> 1;
+            if(nums[m] <= target){
+                l = m+1;
+            }else{
+                r = m-1;
+            }
+        }
+        return (r < 0 || nums[r] != target)? -1 : r;
+    }
+```
+- **旋转图像**  
+```
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        for(int i = 0;i < n;i++){
+            for(int j = i;j < n;j++){
+                int t = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = t;
+            }
+        }
+        for(int i = 0;i < n;i++){
+            for(int j = 0;j < (n >> 1);j++){
+                int t = matrix[i][j];
+                matrix[i][j] = matrix[i][n-j-1];
+                matrix[i][n-j-1] = t;
+            }
+        }
+    }
+```
