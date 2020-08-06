@@ -2422,3 +2422,75 @@ class TireNode {
         }
     }
 ```
+- **字母异位词分组**  
+```
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List> ans = new HashMap<>();
+        int[] count = new int[26];
+        for(String s : strs){
+            Arrays.fill(count, 0);
+            for(char c : s.toCharArray()){
+                count[c-'a']++;
+            }
+            StringBuilder sb = new StringBuilder();
+            for(int cnt : count){
+                sb.append(cnt);
+            }
+            String key = sb.toString();
+            if(!ans.containsKey(key)){
+                ans.put(key, new ArrayList<>());
+            }
+            ans.get(key).add(s);
+        }
+        return new ArrayList(ans.values());
+    }
+```  
+- **最长公共子序列**  
+```
+    public int longestCommonSubsequence(String text1, String text2) {
+        int l1 = text1.length(), l2 = text2.length();
+        int[][] dp = new int[l1+1][l2+1];
+        for(int i = 1;i <= l1;i++){
+            for(int j = 1;j <= l2;j++){
+                dp[i][j] = text1.charAt(i-1) == text2.charAt(j-1) ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]); 
+            }
+        }
+        return dp[l1][l2];
+    }
+```  
+- **回文素数**  
+```
+    public int primePalindrome(int N) {
+        while(true){
+            if(reverse(N) == N && isPrime(N)){
+                return N;
+            }
+            N++;
+            if (10_000_000 < N && N < 100_000_000){
+                N = 100_000_000;
+            }
+        }
+    }
+
+    public int reverse(int N){
+        int t = 0;
+        while(N > 0){
+            t = t*10 + N%10;
+            N /= 10;
+        }
+        return t;
+    }
+
+    public boolean isPrime(int N){
+        if(N < 2){
+            return false;
+        }
+        int t = (int)Math.sqrt(N);
+        for(int i = 2;i <= t;i++){
+            if(N % i == 0){
+                return false;
+            }
+        }
+        return true;
+    }
+```
