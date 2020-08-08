@@ -2510,3 +2510,27 @@ class TireNode {
         return false;
     }
 ```
+- **合并区间**  
+```
+    public int[][] merge(int[][] intervals) {
+        if(intervals.length == 0){
+            return new int[0][0];
+        }
+        int[][] ans = new int[intervals.length][2];
+        Arrays.sort(intervals, (o1, o2) -> o1[0] - o2[0]);
+        int k = 0;
+        ans[k][0] = intervals[0][0];
+        ans[k][1] = intervals[0][1];
+        for(int i = 1;i < intervals.length;i++){
+            int l = ans[k][0], r = ans[k][1];
+            if(intervals[i][0] <= r){
+                ans[k][1] = Math.max(ans[k][1], intervals[i][1]);
+            }else{
+                k += 1;
+                ans[k][0] = intervals[i][0];
+                ans[k][1] = intervals[i][1];
+            }
+        }
+        return Arrays.copyOf(ans, k+1);
+    }
+```
