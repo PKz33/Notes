@@ -2574,3 +2574,26 @@ class TireNode {
         }
     }
 ```
+- **子集**  
+```
+    List<List<Integer>> ans;
+    public List<List<Integer>> subsets(int[] nums) {
+        int n = nums.length;
+        ans = new ArrayList<>();
+        for(int i = 0;i < n+1;i++){
+            bc(0, i, n, new ArrayList<>(), nums);
+        }
+        return ans;
+    }
+
+    public void bc(int id, int k, int n, List<Integer> l, int[] nums){
+        if(l.size() == k){
+            ans.add(new ArrayList(l));
+        }
+        for(int i = id;i < n;i++){
+            l.add(nums[i]);
+            bc(i+1, k, n, l, nums);
+            l.remove(l.size()-1);
+        }
+    } 
+```
