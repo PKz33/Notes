@@ -2597,3 +2597,35 @@ class TireNode {
         }
     } 
 ```
+- **单词搜索**  
+```
+    int[][] dirts = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+    public boolean exist(char[][] board, String word) {
+        boolean[][] marked = new boolean[board.length][board[0].length];
+        for(int i = 0;i < board.length;i++){
+            for(int j = 0;j < board[0].length;j++){
+                if(dfs(i, j, board, 0, word, marked)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean dfs(int i, int j, char[][] board, int cur, String word, boolean[][] marked){
+        if(i<0 || i>=board.length || j<0 || j>=board[0].length || board[i][j] != word.charAt(cur) || marked[i][j]){
+            return false;
+        }
+        if(cur == word.length()-1){
+            return true;
+        }
+        marked[i][j] = true;
+        for(int[] dir : dirts){
+            if(dfs(i+dir[0], j+dir[1], board, cur+1, word, marked)){
+                return true;
+            }
+        }
+        marked[i][j] = false;
+        return false;
+    }
+```
