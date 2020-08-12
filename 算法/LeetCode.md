@@ -2629,3 +2629,42 @@ class TireNode {
         return false;
     }
 ```
+- **二叉树的中序遍历**  
+```
+    public List<Integer> inorderTraversal(TreeNode root) {
+        Stack<TreeNode> s = new Stack<>();
+        List<Integer> ans = new ArrayList<>();
+        TreeNode cur = root;
+        while(cur!= null || !s.isEmpty()){
+            while(cur != null){
+                s.push(cur);
+                cur = cur.left;
+            }
+            cur = s.pop();
+            ans.add(cur.val);
+            cur = cur.right;
+        }
+        return ans;
+    }
+```  
+- **验证二叉搜索树**  
+```
+    public boolean isValidBST(TreeNode root) {
+        Stack<TreeNode> s = new Stack<>();
+        long pre = Long.MIN_VALUE;
+        TreeNode cur = root;
+        while(cur != null || !s.isEmpty()){
+            while(cur != null){
+                s.push(cur);
+                cur = cur.left;
+            }
+            cur = s.pop();
+            if(cur.val <= pre){
+                return false;
+            }
+            pre = cur.val;
+            cur = cur.right;
+        }
+        return true;
+    }
+```
