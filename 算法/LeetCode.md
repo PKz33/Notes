@@ -2723,3 +2723,84 @@ class TireNode {
         return dp[s.length()];
     }
 ```
+- **岛屿数量**  
+```
+    int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+    public int numIslands(char[][] grid) {
+        int ans = 0;
+        if(grid == null || grid.length == 0){
+            return ans;
+        }
+        int rs = grid.length, cs = grid[0].length;
+        for(int i = 0;i < rs;i++){
+            for(int j = 0;j < cs;j++){
+                if(grid[i][j] == '1'){
+                    ans++;
+                    dfs(grid, i, j, rs, cs);
+                }
+            }
+        }
+        return ans;
+    }
+
+    public void dfs(char[][] grid, int r, int c, int rs, int cs){
+        if(r < 0 || c < 0 || r >= rs || c >= cs || grid[r][c] == '0'){
+            return;
+        }
+        grid[r][c] = '0';
+        for(int[] dir : dirs){
+            dfs(grid, r+dir[0], c+dir[1], rs, cs);
+        }
+    }
+```
+- **寻找重复数**  
+```
+    public int findDuplicate(int[] nums) {
+        int l = 1, r = nums.length - 1;
+        while(l < r){
+            int t = (l + r) >>> 1;
+            int cnt = 0;
+            for(int n : nums){
+                if(n <= t){
+                    cnt++;
+                }
+            }
+            if(cnt > t){
+                r = t;
+            }else{
+                l = t + 1;
+            }
+        }
+        return l;
+    }
+```
+- **前K个高频元素**  
+```
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> m = new HashMap<>();
+        for(int n : nums){
+            if(m.containsKey(n)){
+                m.put(n, m.get(n)+1);
+            }else{
+                m.put(n, 1);
+            }
+        }
+        PriorityQueue<Integer> q = new PriorityQueue<>((o1, o2) -> m.get(o1) - m.get(o2));
+        for(int key : m.keySet()){
+            if(q.size() < k){
+                q.offer(key);
+            }else{
+                if(m.get(key) > m.get(q.peek())){
+                    q.poll();
+                    q.offer(key);
+                }
+            }
+        }
+        int[] ans = new int[k];
+        int t = 0;
+        while(!q.isEmpty()){
+            ans[t++] = q.poll();
+        }
+        return ans;
+    }
+```
