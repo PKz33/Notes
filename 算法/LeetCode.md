@@ -2804,3 +2804,57 @@ class TireNode {
         return ans;
     }
 ```
+- **字符串解码**  
+```
+    public String decodeString(String s) {
+        Stack<String> ss = new Stack<>();
+        Stack<Integer> sn = new Stack<>();
+        StringBuilder ans = new StringBuilder();
+        int t = 0;
+        for(char c : s.toCharArray()){
+            if(c == '['){
+                ss.push(ans.toString());
+                sn.push(t);
+                ans = new StringBuilder();
+                t = 0;
+            }else if(c == ']'){
+                StringBuilder sb = new StringBuilder();
+                int n = sn.pop();
+                for(int i = 0;i < n;i++){
+                    sb.append(ans);
+                }
+                ans = new StringBuilder(ss.pop() + sb);
+            }else if(c >= '0' && c <= '9'){
+                t = t*10 + Integer.parseInt(c+"");
+            }else{
+                ans.append(c);
+            }
+        }
+        return ans.toString();
+    }
+```  
+- **目标和**  
+```
+    int[] dirs = {-1, 1};
+    int ans;
+    public int findTargetSumWays(int[] nums, int S) {
+        ans = 0;
+        int cur = 0;
+        dfs(nums, 0, cur, S);
+        return ans;
+    }
+
+    public void dfs(int[] nums, int id, int cur, int S){
+        if(id == nums.length){
+            if(cur == S){
+                ans++;
+            }
+            return;
+        }
+        for(int d : dirs){
+            cur += nums[id]*d;
+            dfs(nums, id+1, cur, S);
+            cur -= nums[id]*d;
+        }
+    }
+```
