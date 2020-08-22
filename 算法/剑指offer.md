@@ -1557,3 +1557,30 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         System.out.println();
     }
 ```
+- **字符串排序**  
+```
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            String s = sc.next();
+            LinkedList<Character> l = new LinkedList<>();
+            for(char c : s.toCharArray()){
+                if(Character.isLetter(c)){
+                    l.offer(c);
+                }
+            }
+            Collections.sort(l, (o1, o2) -> Character.toLowerCase(o1) - Character.toLowerCase(o2));
+            int t = 0;
+            StringBuilder sb = new StringBuilder();
+            for(char c : s.toCharArray()){
+                if(Character.isLetter(c) && t < l.size()){
+                    sb.append(l.get(t));
+                    t++;
+                }else{
+                    sb.append(c);
+                }
+            }
+            System.out.println(sb.toString());
+        }
+    }
+```
