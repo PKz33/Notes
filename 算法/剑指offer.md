@@ -1,4 +1,4 @@
-## 剑指offer
+## 牛客网
 - **二维数组中的查找**  
 1. 题目描述：二维数组每一行从左到右递增，每一列从上到下递增，判断数组中是否存在给定整数  
 2. 代码实现：  
@@ -1522,5 +1522,38 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }else{
             return (int)Math.pow(3, a) * 2;
         }
+    }
+```
+- **最长公共子串**  
+```
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String s1 = sc.next();
+        String s2 = sc.next();
+        int l1 = s1.length();
+        int l2 = s2.length();
+        int[][] dp = new int[l1+1][l2+1];
+        int max = 0;
+        int end = 0;
+        for(int i = 1;i <= l1;i++){
+            for(int j = 1;j <= l2;j++){
+                if(s1.charAt(i-1) == s2.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                    if(dp[i][j] > max){
+                        max = dp[i][j];
+                        end = i;
+                    }
+                }else{
+                    dp[i][j] = 0;
+                }
+            }
+        }
+        if(max == 0){
+            System.out.println(-1);
+        }
+        for(int i = (end-max);i < end;i++){
+            System.out.print(s1.charAt(i));
+        }
+        System.out.println();
     }
 ```
