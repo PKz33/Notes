@@ -2900,3 +2900,20 @@ class TireNode {
         return dp[n-1][sum];
     }
 ```
+- **和为K的子数组**  
+```
+    public int subarraySum(int[] nums, int k) {
+        HashMap<Integer, Integer> m = new HashMap<>();
+        m.put(0, 1);
+        int pre = 0;
+        int ans = 0;
+        for(int n : nums){
+            pre += n;
+            if(m.containsKey(pre-k)){
+                ans += m.get(pre-k);
+            }
+            m.put(pre, m.getOrDefault(pre, 0) + 1);
+        }
+        return ans;
+    }
+```
