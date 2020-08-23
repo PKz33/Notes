@@ -2869,4 +2869,34 @@ class TireNode {
         int n = people.length;
         return l.toArray(new int[n][2]);
     }
+```  
+- **分割等和子集**  
+```
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for(int num : nums){
+            sum += num;
+        }
+        if(sum%2 != 0){
+            return false;
+        }
+        sum = (sum>>>1);
+        int n = nums.length;
+        boolean[][] dp = new boolean[n][sum+1];
+        if(nums[0] <= sum){
+            dp[0][nums[0]] = true;
+        }
+        for(int i = 1;i < n;i++){
+            for(int j = 0;j <= sum;j++){
+                if(nums[i] > j){
+                    dp[i][j] = dp[i-1][j];
+                }else if(nums[i] == j){
+                    dp[i][j] = true;
+                }else{
+                    dp[i][j] = dp[i-1][j] || dp[i-1][j-nums[i]];
+                }
+            }
+        }
+        return dp[n-1][sum];
+    }
 ```
