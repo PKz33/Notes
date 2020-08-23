@@ -1584,3 +1584,29 @@ public int MoreThanHalfNum_Solution(int[] nums) {
         }
     }
 ```
+- **任务调度器**  
+```
+    public int leastInterval(char[] tasks, int n) {
+        int[] count = new int[26];
+        for(char c : tasks){
+            count[c-'A']++;
+        }
+        int ans = 0;
+        Arrays.sort(count);
+        while(count[25] > 0){
+            int i = 0;
+            while(i <= n){
+                if(count[25] == 0){
+                    break;
+                }
+                if(i<26 && count[25-i] > 0){
+                    count[25-i]--;
+                }
+                ans++;
+                i++;
+            }
+            Arrays.sort(count);
+        }
+        return ans;
+    }
+```
