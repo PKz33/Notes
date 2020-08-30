@@ -2952,3 +2952,65 @@ class TireNode {
         return ans;
     }
 ```
+- **字符串的排列**  
+```
+    public boolean checkInclusion(String s1, String s2) {
+        if(s1.length() > s2.length()){
+            return false;
+        }
+        int[] t1 = new int[26];
+        for(char c : s1.toCharArray()){
+            t1[c-'a']++;
+        }
+        for(int i = 0;i <= s2.length()-s1.length();i++){
+            int[] t2 = new int[26];
+            for(int j = i;j < i+s1.length();j++){
+                t2[s2.charAt(j)-'a']++;
+            }
+            if(match(t1, t2)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean match(int[] t1, int[] t2){
+        for(int i = 0;i < 26;i++){
+            if(t1[i] != t2[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+```  
+- **二叉树的锯齿形层次遍历**  
+```
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ans = new ArrayList<>();
+        LinkedList<TreeNode> l = new LinkedList<>();
+        l.offer(root);
+        boolean flag = true;
+        while(!l.isEmpty()){
+            int size = l.size();
+            TreeNode cur = null;
+            ArrayList<Integer> lt = new ArrayList<>();
+            while(size-- > 0){
+                cur = l.poll();
+                if(cur == null){
+                    continue;
+                }
+                lt.add(cur.val);
+                l.offer(cur.left);
+                l.offer(cur.right);
+            }
+            if(flag == false){
+                Collections.reverse(lt);
+            }
+            if(lt.size() > 0){
+                ans.add(lt);
+            }
+            flag = !flag;
+        }
+        return ans;
+    }
+```
