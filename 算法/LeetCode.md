@@ -3030,3 +3030,33 @@ class TireNode {
         return sb.toString();
     }
 ```
+- **岛屿的最大面积**  
+```
+    int ans;
+    int cur;
+    int[][] dir = new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    public int maxAreaOfIsland(int[][] grid) {
+        ans = 0;
+        for(int i = 0;i < grid.length;i++){
+            for(int j = 0;j < grid[0].length;j++){
+                if(grid[i][j] == 1){
+                    cur = 0;
+                    dfs(i, j, grid);
+                    ans = Math.max(ans, cur);
+                }
+            }
+        }
+        return ans;
+    }
+
+    public void dfs(int i, int j, int[][] grid){
+        if(i < 0 || i >= grid.length || j < 0 || j >= grid[0].length || grid[i][j] == 0){
+            return;
+        }
+        cur++;
+        grid[i][j] = 0;
+        for(int[] d : dir){
+            dfs(i + d[0], j + d[1], grid);
+        }
+    }
+```
