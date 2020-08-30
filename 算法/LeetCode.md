@@ -3014,3 +3014,19 @@ class TireNode {
         return ans;
     }
 ```
+- **翻转字符串里的单词**  
+```
+    public String reverseWords(String s) {
+        s = s.trim();
+        String[] arr = s.split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for(int i = arr.length-1;i >= 0;i--){
+            if(i == 0){
+                sb.append(arr[i]);
+            }else{
+                sb.append(arr[i] + " ");
+            }
+        }
+        return sb.toString();
+    }
+```
