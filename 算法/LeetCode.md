@@ -3060,3 +3060,48 @@ class TireNode {
         }
     }
 ```
+- **第k个排列**  
+```
+    int[] fac;
+    int n;
+    int k;
+    boolean[] used;
+    List<Integer> path;
+    public String getPermutation(int n, int k) {
+        this.n = n;
+        this.k = k;
+        used = new boolean[n+1];
+        Arrays.fill(used, false);
+        fac = new int[n+1];
+        fac[0] = 1;
+        for(int i = 1;i <= n;i++){
+            fac[i] = fac[i-1] * i;
+        }
+        path = new ArrayList<>();
+        dfs(0);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Integer c : path) {
+            stringBuilder.append(c);
+        }
+        return stringBuilder.toString();
+    }
+    
+    public void dfs(int id){
+        if(id == n){
+            return;
+        }
+        int cnt = fac[n-id-1];
+        for(int i = 1;i <= n;i++){
+            if(used[i]){
+                continue;
+            }
+            if(cnt < k){
+                k -= cnt;
+                continue;
+            }
+            path.add(i);
+            used[i] = true;
+            dfs(id+1);
+        }
+    }
+```
