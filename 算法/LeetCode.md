@@ -3105,3 +3105,123 @@ class TireNode {
         }
     }
 ```
+- **二叉树的所有路径**  
+```
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ans = new ArrayList<>();
+        dfs(root, new String(), ans);
+        return ans;
+    }
+
+    public void dfs(TreeNode node, String path, List<String> ans){
+        if(node != null){
+            StringBuilder sb = new StringBuilder(path);
+            sb.append(node.val);
+            if(node.left == null && node.right == null){
+                ans.add(sb.toString());
+            }else{
+                sb.append("->");
+                dfs(node.left, sb.toString(), ans);
+                dfs(node.right, sb.toString(), ans);
+            }
+        }
+    }
+```
+- **LRU缓存机制**  
+```
+class LRUCache {
+    
+    class DLinkedNode{
+        int k;
+        int v;
+        DLinkedNode pre;
+        DLinkedNode next;
+        public DLinkedNode(){
+        }
+        public DLinkedNode(int k, int v){
+            this.k = k;
+            this.v = v;
+        }
+    }
+    
+    DLinkedNode head, tail;
+    HashMap<Integer, DLinkedNode> cache;
+    int capacity;
+    int size;
+
+    public LRUCache(int capacity) {
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head.next = tail;
+        tail.pre = head;
+        this.capacity = capacity;
+        size = 0;
+        cache = new HashMap<>();
+    }
+    
+    public int get(int key) {
+        DLinkedNode t = cache.get(key);
+        if(t == null){
+            return -1;
+        }
+        moveToHead(t);
+        return t.v;
+    }
+    
+    public void put(int key, int value) {
+        DLinkedNode t = cache.get(key);
+        if(t != null){
+            t.v = value;
+            moveToHead(t);
+        }else{
+            DLinkedNode tt = new DLinkedNode(key, value);
+            addToHead(tt);
+            cache.put(key, tt);
+            size++;
+            if(size > capacity){
+                cache.remove(tail.pre.k);
+                remove(tail.pre);
+                size--;
+            }
+        }
+    }
+    
+    public void moveToHead(DLinkedNode node){
+        remove(node);
+        addToHead(node);
+    }
+    
+    public void remove(DLinkedNode node){
+        node.pre.next = node.next;
+        node.next.pre = node.pre;
+    } 
+    
+    public void addToHead(DLinkedNode node){
+        node.next = head.next;
+        head.next.pre = node;
+        head.next = node;
+        node.pre = head;
+    }
+}
+```
+- **外观数列**  
+```
+    public static String countAndSay(int n) {
+        if(n == 1){
+            return "1";
+        }
+        String pre = countAndSay(n-1);
+        StringBuilder sb = new StringBuilder();
+        int c = 1;
+        for(int i = 0;i < pre.length()-1;i++){
+            if(pre.charAt(i) == pre.charAt(i+1)){
+                c++;
+            }else{
+                sb.append("" + c + pre.charAt(i));
+                c = 1;
+            }
+        }
+        sb.append("" + c + pre.charAt(pre.length()-1));
+        return sb.toString();
+    }
+```
