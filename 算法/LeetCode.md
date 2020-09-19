@@ -3225,3 +3225,24 @@ class LRUCache {
         return sb.toString();
     }
 ```
+- **二叉树的前序遍历**  
+```
+    public List<Integer> preorderTraversal(TreeNode root) {
+        Stack<TreeNode> s = new Stack<>();
+        if(root != null){
+            s.push(root);
+        }
+        List<Integer> ans = new ArrayList<>();
+        while(!s.isEmpty()){
+            TreeNode t = s.pop();
+            ans.add(t.val);
+            if(t.right != null){
+                s.push(t.right);
+            }
+            if(t.left != null){
+                s.push(t.left);
+            }
+        }
+        return ans;
+    }
+```
