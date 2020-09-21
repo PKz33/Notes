@@ -3246,3 +3246,37 @@ class LRUCache {
         return ans;
     }
 ```
+- **螺旋矩阵**  
+```
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> ans = new ArrayList<>();
+        if(matrix.length == 0 || matrix[0].length == 0){
+            return ans;
+        }
+        int rs = 0, cs = 0;
+        int re = matrix.length-1, ce = matrix[0].length-1;
+        while(rs<=re && cs<=ce){
+            for(int i = cs;i <= ce;i++){
+                ans.add(matrix[rs][i]);
+            }
+            for(int i = rs+1;i <= re;i++){
+                ans.add(matrix[i][ce]);
+            }
+            if(re > rs){
+                for(int i = ce-1;i >= cs;i--){
+                    ans.add(matrix[re][i]);
+                }
+            }
+            if(ce > cs){
+                for(int i = re-1;i > rs;i--){
+                    ans.add(matrix[i][cs]);
+                }
+            }
+            rs++;
+            re--;
+            cs++;
+            ce--;
+        }
+        return ans;
+    }
+```
