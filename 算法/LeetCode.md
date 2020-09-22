@@ -3290,3 +3290,22 @@ class LRUCache {
         System.arraycopy(nums2, 0, nums1, 0, p2+1);
     }
 ```
+- **划分字母区间**  
+```
+    public List<Integer> partitionLabels(String S) {
+        int[] a = new int[26];
+        for(int i = 0;i < S.length();i++){
+            a[S.charAt(i)-'a'] = i;
+        }
+        List<Integer> ans = new ArrayList<>();
+        int t = 0, cur = 0;
+        for(int i = 0;i < S.length();i++){
+            t = Math.max(t, a[S.charAt(i)-'a']);
+            if(t == i){
+                ans.add(i-cur+1);
+                cur = i+1;
+            }
+        }
+        return ans;
+    }
+```
