@@ -3225,6 +3225,7 @@ class LRUCache {
         return sb.toString();
     }
 ```
+<<<<<<< HEAD
 - **合并二叉树**  
 ```
     public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
@@ -3240,3 +3241,89 @@ class LRUCache {
         return m;
     }
 ```
+=======
+- **二叉树的前序遍历**  
+```
+    public List<Integer> preorderTraversal(TreeNode root) {
+        Stack<TreeNode> s = new Stack<>();
+        if(root != null){
+            s.push(root);
+        }
+        List<Integer> ans = new ArrayList<>();
+        while(!s.isEmpty()){
+            TreeNode t = s.pop();
+            ans.add(t.val);
+            if(t.right != null){
+                s.push(t.right);
+            }
+            if(t.left != null){
+                s.push(t.left);
+            }
+        }
+        return ans;
+    }
+```
+- **螺旋矩阵**  
+```
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> ans = new ArrayList<>();
+        if(matrix.length == 0 || matrix[0].length == 0){
+            return ans;
+        }
+        int rs = 0, cs = 0;
+        int re = matrix.length-1, ce = matrix[0].length-1;
+        while(rs<=re && cs<=ce){
+            for(int i = cs;i <= ce;i++){
+                ans.add(matrix[rs][i]);
+            }
+            for(int i = rs+1;i <= re;i++){
+                ans.add(matrix[i][ce]);
+            }
+            if(re > rs){
+                for(int i = ce-1;i >= cs;i--){
+                    ans.add(matrix[re][i]);
+                }
+            }
+            if(ce > cs){
+                for(int i = re-1;i > rs;i--){
+                    ans.add(matrix[i][cs]);
+                }
+            }
+            rs++;
+            re--;
+            cs++;
+            ce--;
+        }
+        return ans;
+    }
+```
+- **合并两个有序数组**  
+```
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int p = m+n-1, p1 = m-1, p2 = n-1;
+        while(p1>=0 && p2>=0){
+            nums1[p--] = nums1[p1] < nums2[p2] ? nums2[p2--] : nums1[p1--]; 
+        }
+        System.arraycopy(nums2, 0, nums1, 0, p2+1);
+    }
+```
+- **划分字母区间**  
+```
+    public List<Integer> partitionLabels(String S) {
+        int[] a = new int[26];
+        for(int i = 0;i < S.length();i++){
+            a[S.charAt(i)-'a'] = i;
+        }
+        List<Integer> ans = new ArrayList<>();
+        int t = 0, cur = 0;
+        for(int i = 0;i < S.length();i++){
+            t = Math.max(t, a[S.charAt(i)-'a']);
+            if(t == i){
+                ans.add(i-cur+1);
+                cur = i+1;
+            }
+        }
+        return ans;
+    }
+```
+>>>>>>> d2ebac40c2e5c74eaef2ff8e364b816a51064b06
