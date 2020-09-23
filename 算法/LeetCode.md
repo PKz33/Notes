@@ -3225,23 +3225,6 @@ class LRUCache {
         return sb.toString();
     }
 ```
-<<<<<<< HEAD
-- **合并二叉树**  
-```
-    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
-        if(t1 == null){
-            return t2;
-        }
-        if(t2 == null){
-            return t1;
-        }
-        TreeNode m = new TreeNode(t1.val + t2.val);
-        m.left = mergeTrees(t1.left, t2.left);
-        m.right = mergeTrees(t1.right, t2.right);
-        return m;
-    }
-```
-=======
 - **二叉树的前序遍历**  
 ```
     public List<Integer> preorderTraversal(TreeNode root) {
@@ -3326,4 +3309,52 @@ class LRUCache {
         return ans;
     }
 ```
->>>>>>> d2ebac40c2e5c74eaef2ff8e364b816a51064b06
+- **仅仅反转字母**  
+```
+    public String reverseOnlyLetters(String S) {
+        StringBuilder sb1 = new StringBuilder(S);
+        StringBuilder sb2 = new StringBuilder(S);
+        int l = 0, r = S.length()-1;
+        while(l<S.length() && r>=0){
+            if(Character.isLetter(sb2.charAt(r))){
+                if(Character.isLetter(sb1.charAt(l))){
+                    sb1.setCharAt(l, sb2.charAt(r));
+                    l++;
+                    r--;
+                }else{
+                    l++;
+                }
+            }else{
+                r--;
+            }
+        }
+        return sb1.toString();
+    }
+```
+- **连续子数组的最大和**  
+```
+    public int maxSubArray(int[] nums) {
+        int sum = 0;
+        int ans = Integer.MIN_VALUE;
+        for(int num : nums){
+            sum = sum <= 0 ? num : sum+num;
+            ans = Math.max(ans, sum);
+        }
+        return ans;
+    }
+```  
+- **合并二叉树**  
+```
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if(t1 == null){
+            return t2;
+        }
+        if(t2 == null){
+            return t1;
+        }
+        TreeNode m = new TreeNode(t1.val + t2.val);
+        m.left = mergeTrees(t1.left, t2.left);
+        m.right = mergeTrees(t1.right, t2.right);
+        return m;
+    }
+```
