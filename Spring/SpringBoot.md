@@ -225,3 +225,19 @@ public class HelloController {
 pkz33.hello.prefix=PKZ
 pkz33.hello.suffix=33
 ```
+- **缓存**  
+1. `@Cacheable`，被标注方法执行之前先检查缓存有没有数据，若没有则方法执行之后将结果缓存  
+2. `@CachePut`，先调用被标注方法，然后将方法执行之后的结果缓存（更新缓存）  
+3. `@CacheEvict`，缓存清除，默认在被标注方法执行之后执行  
+- **MQ**  
+数据流：Publisher-Exchange-Queue-Consumer  
+- **Elasticsearch**  
+层级：ES-索引-类型-文档  
+- **异步**  
+1. `@EnableAsync`，开启异步功能    
+2. `@Async`，标注方法为异步  
+- **定时**  
+1. `@EnableScheduling`，开启定时功能  
+2. `@Scheduled(cron = "* * * * * MON-SUN")`，标注方法定时执行，参数位分别对应：second，minute，hour，day of month，month，day of week  
+- **Spring Cloud**  
+1. 常用组件：Netflix Eureka，服务发现；Netflix Ribbon，客户端负载均衡；Netflix Hystix，断路器；Netflix Zuul，服务网关；Spring Cloud Config，分布式配置  
