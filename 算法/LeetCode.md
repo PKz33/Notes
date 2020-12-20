@@ -3382,3 +3382,20 @@ class LRUCache {
         return new int[]{m, n};
     }
 ```
+- **旋转数组的最小数字**  
+```
+    public int minArray(int[] numbers) {
+        int l = 0, r = numbers.length-1;
+        while(l < r){
+            int m = (l + r) >> 1;
+            if(numbers[m] < numbers[r]){
+                r = m;
+            }else if(numbers[m] > numbers[r]){
+                l = m + 1;
+            }else{
+                r--;
+            }
+        }
+        return numbers[r];
+    }
+```
