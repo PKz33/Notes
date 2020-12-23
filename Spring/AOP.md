@@ -418,3 +418,28 @@ c. `create`方法的参数：
   public class SpringConfiguration {
   }
 ```
+- **循环依赖**  
+1.  
+```
+@Component("aService")
+public class AService{
+  @Autowired
+  private BService bService;
+}
+
+@Component("bService")
+public class BService{
+  @Autowired
+  private AService aService;
+}
+```  
+2. Bean的部分生命周期：实例化（创建原始对象）- 填充属性 - 创建代理对象（若需要）- 添加到第一级缓存（单例池）  
+3. 三级缓存：  
+a. 第一级缓存，单例池，singletonObjects，Map<beanName, Bean对象(完成品)>  
+b. 第二级缓存，earlySingletonObjects，Map<beanName, Bean对象(半成品)>  
+c. 第三级缓存，singletonFactories，Map<beanName, lamda(生成原始对象)>  
+4. 循环依赖情况下，Bean的创建过程（以上面AService、BService为例）:  
+a. creatingSet<'aService'>，标记Bean在创建中  
+b. 实例化AService原始对象，并放入第三级缓存singletonFactories<"aService", lamda(生成AService原始对象)>  
+c. 填充aService的bService属性，若第一级缓存中不存在，则创建BService的对象：实例化（原始对象）并放入第三级缓存；填充bService的aService属性，若第一级缓存中不存在，则查询第二级缓存；若第二级缓存中不存在，且判断aService状态为“creating”，则认为出现循环依赖；查询第三级缓存，创建aService对象(半成品)放入第二级缓存，并填充bService的aService属性；填充aService的bService属性，bService对象放入第一级缓存  
+d. aService对象从第二级缓存移入第一级缓存  
