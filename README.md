@@ -22,7 +22,7 @@
 - [Redis](./Java/Redis.md)  
 - [RabbitMQ](./Java/RabbitMQ.md)
 - [Dubbo](./Java/Dubbo.md)  
-- [总结](./Java/总结.md)
+- [重点](./Java/重点.md)
 # Spring  
 - [体系结构](./Spring/体系结构.md)  
 - [IOC](./Spring/IOC.md)
