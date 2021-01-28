@@ -3399,3 +3399,44 @@ class LRUCache {
         return numbers[r];
     }
 ```
+- **柱状图中最大的矩形**  
+```
+    public static int largestRectangleArea(int[] heights) {
+        Stack<Integer> stack = new Stack<>();
+        int n = heights.length;
+        int[] l = new int[n];
+        int[] r = new int[n];
+        for (int i = 0;i < n;i++){
+            while (!stack.empty() && heights[stack.peek()]>=heights[i]) stack.pop();
+            l[i] = stack.empty() ? -1 : stack.peek();
+            stack.push(i);
+        }
+        stack.clear();
+        for (int i = n-1;i >= 0;i--){
+            while (!stack.empty() && heights[stack.peek()]>=heights[i]) stack.pop();
+            r[i] = stack.empty() ? n : stack.peek();
+            stack.push(i);
+        }
+        int ans = 0;
+        for (int i = 0;i < n;i++)
+            ans = Math.max(ans, (r[i]-l[i]-1)*heights[i]);
+        return ans;
+    }
+```  
+- **最长有效括号**  
+```
+    public static int longestValidParentheses(String s) {
+        int ans = 0;
+        Stack<Integer> stack = new Stack<>();
+        stack.push(-1);
+        for (int i = 0;i < s.length();i++){
+            if (s.charAt(i) == '(') stack.push(i);
+            else {
+                stack.pop();
+                if (stack.empty()) stack.push(i);
+                else ans = Math.max(ans, i-stack.peek());
+            }
+        }
+        return ans;
+    }
+```
