@@ -3440,3 +3440,68 @@ class LRUCache {
         return ans;
     }
 ```
+- **最大矩形**  
+```
+    public int maximalRectangle(char[][] matrix){
+        if (matrix.length == 0) return 0;
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] width = new int[m][n];
+        int ans = 0;
+        for (int i=0;i<m;i++){
+            for (int j=0;j<n;j++){
+                if (matrix[i][j] == '1')
+                    width[i][j] = j==0 ? 1 : width[i][j-1]+1;
+                else width[i][j] = 0;
+                int w = width[i][j];
+                for (int row=i;row>=0;row--){
+                    int h = i-row+1;
+                    w = Math.min(w, width[row][j]);
+                    ans = Math.max(ans, h*w);
+                }
+            }
+        }
+        return ans;
+    }
+```  
+- **滑动窗口最大值**  
+```
+    public int[] maxSlidingWindow(int[] nums, int k){
+        int n = nums.length;
+        PriorityQueue<int[]> q = new PriorityQueue<>(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[0]==o2[0] ? o2[1]-o1[1] : o2[0]-o1[0];
+            }
+        });
+        int[] ans = new int[n-k+1];
+        for(int i=0;i<n-k+1;i++){
+            if (i==0){
+                for (int j=0;j<k;j++)
+                    q.offer(new int[]{nums[j],j});
+                ans[i] = q.peek()[0];
+                continue;
+            }
+            q.offer(new int[]{nums[i+k-1],i+k-1});
+            while (q.peek()[1]<i) q.poll();
+            ans[i] = q.peek()[0];
+        }
+        return ans;
+    }
+```  
+- **二叉树中最大路径和**  
+```
+    int ans = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root){
+        maxGain(root);
+        return ans;
+    }
+
+    public int maxGain(TreeNode node){
+        if (node == null) return 0;
+        int l = Math.max(maxGain(node.left), 0);
+        int r = Math.max(maxGain(node.right), 0);
+        ans = Math.max(ans, node.val+l+r);
+        return node.val + Math.max(l, r);
+    }
+```
