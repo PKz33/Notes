@@ -3505,3 +3505,62 @@ class LRUCache {
         return node.val + Math.max(l, r);
     }
 ```
+- **戳气球**  
+```
+    public int maxCoins(int[] nums){
+        int n = nums.length;
+        int[][] dp = new int[n+2][n+2];
+        int[] val = new int[n+2];
+        val[0] = val[n+1] = 1;
+        for (int i=1;i<=n;i++) val[i] = nums[i-1];
+        for (int i=n-1;i>=0;i--)
+            for (int j=i+2;j<=n+1;j++)
+                for (int k=i+1;k<j;k++){
+                    int cur = val[i]*val[k]*val[j];
+                    cur += dp[i][k]+dp[k][j];
+                    dp[i][j] = Math.max(cur, dp[i][j]);
+                }
+        return dp[0][n+1];
+    }
+```  
+- **删除无效括号**  
+```
+    Set<String> ansSet = new HashSet<>();
+    int minRem = Integer.MAX_VALUE;
+
+    public List<String> removeInvalidParentheses(String s){
+        recurse(s, 0, 0, 0, 0, new StringBuilder());
+        return new ArrayList<>(ansSet);
+    }
+
+    public void recurse(String s, int index, int leftCount, int rightCount, int remCount, StringBuilder exp){
+        if (index == s.length()){
+            if (leftCount == rightCount){
+                if (remCount <= minRem){
+                    if (remCount < minRem){
+                        ansSet.clear();
+                        minRem = remCount;
+                    }
+                    ansSet.add(exp.toString());
+                }
+            }
+        }else {
+            char curChar = s.charAt(index);
+            int curLen = exp.length();
+            if (curChar!='(' && curChar!=')'){
+                exp.append(curChar);
+                recurse(s, index+1, leftCount, rightCount, remCount, exp);
+                exp.deleteCharAt(curLen);
+            }else {
+                recurse(s, index+1, leftCount, rightCount, remCount+1, exp);
+                exp.append(curChar);
+                if (curChar == '('){
+                    recurse(s, index+1, leftCount+1, rightCount, remCount, exp);
+                }else if (rightCount < leftCount){
+                    recurse(s, index+1, leftCount, rightCount+1, remCount, exp);
+                }
+                exp.deleteCharAt(curLen);
+            }
+        }
+    }
+``` 
