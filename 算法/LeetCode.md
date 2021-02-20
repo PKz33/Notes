@@ -3611,3 +3611,36 @@ class LRUCache {
         return ans;
     }
 ```
+- **最小覆盖子串**  
+```
+        HashMap<Character, Integer> smap = new HashMap<>();
+        HashMap<Character, Integer> tmap = new HashMap<>();
+        for (char c : t.toCharArray())
+            tmap.put(c, tmap.getOrDefault(c,0)+1);
+        int curValid = 0;
+        int minLen = Integer.MAX_VALUE;
+        int left = 0, right = 0;
+        int start = 0;
+        while (right < s.length()){
+            char c = s.charAt(right);
+            right++;
+            if (tmap.containsKey(c)){
+                smap.put(c, smap.getOrDefault(c,0)+1);
+                if (tmap.get(c).equals(smap.get(c))) curValid++;
+            }
+            while (curValid == tmap.size()){
+                if (right-left < minLen){
+                    minLen = right - left;
+                    start = left;
+                }
+                char cc = s.charAt(left);
+                left++;
+                if (smap.containsKey(cc)){
+                    if (smap.get(cc).equals(tmap.get(cc)))
+                        curValid--;
+                    smap.put(cc, smap.get(cc)-1);
+                }
+            }
+        }
+        return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start+minLen);
+```
