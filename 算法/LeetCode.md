@@ -3564,3 +3564,50 @@ class LRUCache {
         }
     }
 ``` 
+- **除法求值**  
+```
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries){
+        int id = 0;
+        int n = equations.size();
+        Map<String, Integer> map = new HashMap<>(2*n);
+        for (int i=0;i<n;i++){
+            String equ1 = equations.get(i).get(0);
+            String equ2 = equations.get(i).get(1);
+            if (!map.containsKey(equ1)){
+                map.put(equ1, id);
+                id++;
+            }
+            if (!map.containsKey(equ2)){
+                map.put(equ2,id);
+                id++;
+            }
+        }
+        int equSize = map.size();
+        double[][] graph = new double[equSize][equSize];
+        for (int i=0;i<equSize;i++)
+            Arrays.fill(graph[i], -1.0);
+        for (int i=0;i<n;i++){
+            String equ1 = equations.get(i).get(0);
+            String equ2 = equations.get(i).get(1);
+            graph[map.get(equ1)][map.get(equ2)] = values[i];
+            graph[map.get(equ2)][map.get(equ1)] = 1.0 / values[i];
+        }
+        for (int k=0;k<equSize;k++)
+            for (int i=0;i<equSize;i++)
+                for (int j=0;j<equSize;j++)
+                    if (graph[i][k]>0 && graph[k][j]>0)
+                        graph[i][j] = graph[i][k] * graph[k][j];
+        int queSize = queries.size();
+        double[] ans = new double[queSize];
+        for (int i=0;i<queSize;i++){
+            String qstr1 = queries.get(i).get(0);
+            String qstr2 = queries.get(i).get(1);
+            if (map.get(qstr1)==null || map.get(qstr2)==null){
+                ans[i] = -1.0;
+                continue;
+            }
+            ans[i] = graph[map.get(qstr1)][map.get(qstr2)];
+        }
+        return ans;
+    }
+```
