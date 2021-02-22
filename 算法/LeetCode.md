@@ -3643,4 +3643,63 @@ class LRUCache {
             }
         }
         return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start+minLen);
+```  
+- **数组中的第K个最大元素**  
+```
+    public int findKthLargest(int[] nums, int k){
+        int l = 0, r = nums.length-1;
+        while (l <= r){
+            int t = partition(nums, l, r);
+            if (k-1 == t) return nums[t];
+            else if (t > k-1) r = t-1;
+            else l = t+1;
+        }
+        return -1;
+    }
+
+    public int partition(int[] nums, int l, int r){
+        int t = nums[l];
+        while (l < r){
+            while (l<r && nums[r]<=t) r--;
+            nums[l] = nums[r];
+            while (l<r && nums[l]>t) l++;
+            nums[r] = nums[l];
+        }
+        nums[l] = t;
+        return l;
+    }
+```
+- **寻找两个正序数组的中位数**  
+```
+    public double findMedianSortedArrays(int[] nums1, int[] nums2){
+        int l1 = nums1.length, l2 = nums2.length;
+        int l = l1 + l2;
+        int left = -1, right = -1;
+        int p1 = 0, p2 = 0;
+        for (int i=0;i<=l/2;i++){
+            left = right;
+            if (p1<l1 && (p2>=l2 || nums1[p1]<nums2[p2]))
+                right = nums1[p1++];
+            else right = nums2[p2++];
+        }
+        return l%2==0 ? (left+right)/2.0 : right;
+    }
+```  
+- **字符的最短距离**  
+```
+    public int[] shortestToChar(String s, char c){
+        int n = s.length();
+        int[] ans = new int[n];
+        int idx = Integer.MIN_VALUE/2;
+        for (int i=0;i<n;i++){
+            if (s.charAt(i) == c) idx = i;
+            ans[i] = i - idx;
+        }
+        idx = Integer.MAX_VALUE/2;
+        for (int i=n-1;i>=0;i--){
+            if (s.charAt(i) == c) idx = i;
+            ans[i] = Math.min(ans[i], idx-i);
+        }
+        return ans;
+    }
 ```
